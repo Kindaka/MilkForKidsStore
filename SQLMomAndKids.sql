@@ -12,8 +12,8 @@ CREATE TABLE [dbo].[Account](
 	[Phone] [nvarchar](10),
 	[Address] [nvarchar](30) ,
 	[dob] [date],
-	[Email] [nvarchar](30) NOT NULL,
-	[password] [nvarchar](MAX) NOT NULL,
+	[Email] [nvarchar](64) NOT NULL,
+	[password] [nvarchar](256) NOT NULL,
 	[status] [Bit] NOT NULL,
     CONSTRAINT [PK_Account] PRIMARY KEY CLUSTERED 
 (
@@ -24,6 +24,7 @@ GO
 Go
 CREATE TABLE [dbo].[Shop](
 	[shopId] [int] IDENTITY NOT NULL,
+	[accountId] [int] NOT NULL,
 	[shopName] [nvarchar](50)	NOT NULL,
 	[shopDetail] [nvarchar](250) NOT NULL,
 	[shopAddress] [nvarchar](250) NOT NULL,
@@ -34,6 +35,12 @@ CREATE TABLE [dbo].[Shop](
 	[shopId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+GO
+ALTER TABLE [dbo].[Shop]  WITH CHECK ADD  CONSTRAINT [FK_Shop_Account] FOREIGN KEY([accountId])
+REFERENCES [dbo].[Account] ([accountId])
+ON UPDATE CASCADE
+ON DELETE CASCADE
 GO
 GO
 CREATE TABLE [dbo].[VoucherOFShop](
@@ -112,8 +119,8 @@ ON DELETE CASCADE
 GO
 ALTER TABLE [dbo].[Cart]  WITH CHECK ADD  CONSTRAINT [FK_Cart_Account] FOREIGN KEY([accountId])
 REFERENCES [dbo].[Account] ([accountId])
-ON UPDATE CASCADE
-ON DELETE CASCADE
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
 GO
 GO
 CREATE TABLE [dbo].[Blog](
@@ -175,8 +182,8 @@ GO
 GO
 ALTER TABLE [dbo].[OrderDetail]  WITH CHECK ADD  CONSTRAINT [FK_OrderDetail_Order] FOREIGN KEY([orderId])
 REFERENCES [dbo].[Order] ([orderId])
-ON UPDATE CASCADE
-ON DELETE CASCADE
+ON UPDATE NO ACTION
+ON DELETE NO ACTION
 GO
 GO
 CREATE TABLE [dbo].[Feedback](

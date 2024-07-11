@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MilkStore_BAL.Mapper;
+using MilkStore_BAL.Services.Implements;
 using MilkStore_BAL.Services.Interfaces;
 using MilkStore_DAL.Entities;
 using MilkStore_DAL.UnitOfWorks.Implements;
@@ -54,7 +55,7 @@ builder.Services.AddMemoryCache();
 
 // Service containers
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IAccountService, IAccountService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
