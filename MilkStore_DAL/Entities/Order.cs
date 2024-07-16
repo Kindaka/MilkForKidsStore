@@ -8,6 +8,7 @@ namespace MilkStore_DAL.Entities
         public Order()
         {
             OrderDetails = new HashSet<OrderDetail>();
+            Payments = new HashSet<Payment>();
         }
 
         public int OrderId { get; set; }
@@ -18,5 +19,6 @@ namespace MilkStore_DAL.Entities
 
         public virtual Account Account { get; set; } = null!;
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
+        public virtual ICollection<Payment> Payments { get; set; }
     }
 }

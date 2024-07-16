@@ -11,7 +11,6 @@ namespace MilkStore_DAL.Entities
             Carts = new HashSet<Cart>();
             Feedbacks = new HashSet<Feedback>();
             Orders = new HashSet<Order>();
-            Ratings = new HashSet<Rating>();
         }
 
         public int AccountId { get; set; }
@@ -28,6 +27,5 @@ namespace MilkStore_DAL.Entities
         public virtual ICollection<Cart> Carts { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
-        public virtual ICollection<Rating> Ratings { get; set; }
     }
 }

@@ -20,20 +20,17 @@ namespace MilkStore_DAL.Entities
         public virtual DbSet<Blog> Blogs { get; set; } = null!;
         public virtual DbSet<Cart> Carts { get; set; } = null!;
         public virtual DbSet<Feedback> Feedbacks { get; set; } = null!;
+        public virtual DbSet<ImageProduct> ImageProducts { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
+        public virtual DbSet<Payment> Payments { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
         public virtual DbSet<ProductCategory> ProductCategories { get; set; } = null!;
-        public virtual DbSet<Rating> Ratings { get; set; } = null!;
-        public virtual DbSet<Shop> Shops { get; set; } = null!;
-        public virtual DbSet<VoucherOfshop> VoucherOfshops { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//                optionsBuilder.UseSqlServer("Server=(local);Database=MomAndKids;Uid=sa;Pwd=12345;TrustServerCertificate=True");
             }
         }
 
@@ -53,7 +50,9 @@ namespace MilkStore_DAL.Entities
 
                 entity.Property(e => e.Email).HasMaxLength(30);
 
-                entity.Property(e => e.Password).HasColumnName("password");
+                entity.Property(e => e.Password)
+                    .HasMaxLength(30)
+                    .HasColumnName("password");
 
                 entity.Property(e => e.Phone).HasMaxLength(10);
 
@@ -111,6 +110,7 @@ namespace MilkStore_DAL.Entities
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Carts)
                     .HasForeignKey(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Cart_Account");
 
                 entity.HasOne(d => d.Product)
@@ -131,12 +131,51 @@ namespace MilkStore_DAL.Entities
                     .HasMaxLength(250)
                     .HasColumnName("content");
 
+                entity.Property(e => e.ProductId).HasColumnName("productId");
+
+                entity.Property(e => e.RateNumber).HasColumnName("rateNumber");
+
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Account)
                     .WithMany(p => p.Feedbacks)
                     .HasForeignKey(d => d.AccountId)
-                    .HasConstraintName("FK_Feedback_Account");
+                    .HasConstraintName("FK_Comment_Account");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Feedbacks)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_Comment_Product");
+            });
+
+            modelBuilder.Entity<ImageProduct>(entity =>
+            {
+                entity.HasKey(e => e.ImageId);
+
+                entity.ToTable("ImageProduct");
+
+                entity.Property(e => e.ImageId).HasColumnName("imageId");
+
+                entity.Property(e => e.ImageContent)
+                    .HasMaxLength(250)
+                    .HasColumnName("imageContent");
+
+                entity.Property(e => e.ImageProduct1)
+                    .HasMaxLength(250)
+                    .HasColumnName("imageProduct");
+
+                entity.Property(e => e.ProductId).HasColumnName("productId");
+
+                entity.Property(e => e.ProductPrice).HasColumnName("productPrice");
+
+                entity.Property(e => e.ProductQuatity)
+                    .HasColumnType("datetime")
+                    .HasColumnName("productQuatity");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ImageProducts)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_ImageProduct_Product");
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -178,6 +217,7 @@ namespace MilkStore_DAL.Entities
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.OrderId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_OrderDetail_Order");
 
                 entity.HasOne(d => d.Product)
@@ -186,15 +226,27 @@ namespace MilkStore_DAL.Entities
                     .HasConstraintName("FK_OrderDetail_Product");
             });
 
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.Property(e => e.OrderId).HasColumnName("orderId");
+
+                entity.Property(e => e.PayDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentAmount).HasColumnType("decimal(13, 2)");
+
+                entity.Property(e => e.PaymentMethod).HasMaxLength(100);
+
+                entity.HasOne(d => d.Order)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.OrderId)
+                    .HasConstraintName("FK_OrderId_Payments");
+            });
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.ToTable("Product");
 
                 entity.Property(e => e.ProductId).HasColumnName("productId");
-
-                entity.Property(e => e.ImageProduct)
-                    .HasMaxLength(250)
-                    .HasColumnName("imageProduct");
 
                 entity.Property(e => e.ProductCategoryId).HasColumnName("productCategoryId");
 
@@ -208,29 +260,12 @@ namespace MilkStore_DAL.Entities
 
                 entity.Property(e => e.ProductPrice).HasColumnName("productPrice");
 
-                entity.Property(e => e.ProductQuatity)
-                    .HasColumnType("datetime")
-                    .HasColumnName("productQuatity");
-
-                entity.Property(e => e.ShopId).HasColumnName("shopId");
-
-                entity.Property(e => e.VoucherId).HasColumnName("voucherId");
+                entity.Property(e => e.ProductQuatity).HasColumnName("productQuatity");
 
                 entity.HasOne(d => d.ProductCategory)
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.ProductCategoryId)
                     .HasConstraintName("FK_Product_pRODUCTcATEGORY");
-
-                entity.HasOne(d => d.Shop)
-                    .WithMany(p => p.Products)
-                    .HasForeignKey(d => d.ShopId)
-                    .HasConstraintName("FK_Product_Shop");
-
-                entity.HasOne(d => d.Voucher)
-                    .WithMany(p => p.Products)
-                    .HasForeignKey(d => d.VoucherId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Product_Voucher");
             });
 
             modelBuilder.Entity<ProductCategory>(entity =>
@@ -246,78 +281,6 @@ namespace MilkStore_DAL.Entities
                 entity.Property(e => e.ProductCategoryName)
                     .HasMaxLength(50)
                     .HasColumnName("productCategoryName");
-            });
-
-            modelBuilder.Entity<Rating>(entity =>
-            {
-                entity.HasKey(e => e.RateId);
-
-                entity.ToTable("Rating");
-
-                entity.Property(e => e.RateId).HasColumnName("rateId");
-
-                entity.Property(e => e.AccountId).HasColumnName("accountId");
-
-                entity.Property(e => e.RateNumber).HasColumnName("rateNumber");
-
-                entity.Property(e => e.Status).HasColumnName("status");
-
-                entity.HasOne(d => d.Account)
-                    .WithMany(p => p.Ratings)
-                    .HasForeignKey(d => d.AccountId)
-                    .HasConstraintName("FK_Rating_Account");
-            });
-
-            modelBuilder.Entity<Shop>(entity =>
-            {
-                entity.ToTable("Shop");
-
-                entity.Property(e => e.ShopId).HasColumnName("shopId");
-
-                entity.Property(e => e.ShopAddress)
-                    .HasMaxLength(250)
-                    .HasColumnName("shopAddress");
-
-                entity.Property(e => e.ShopDetail)
-                    .HasMaxLength(250)
-                    .HasColumnName("shopDetail");
-
-                entity.Property(e => e.ShopEndTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("shopEndTime");
-
-                entity.Property(e => e.ShopName)
-                    .HasMaxLength(50)
-                    .HasColumnName("shopName");
-
-                entity.Property(e => e.ShopStartTime)
-                    .HasColumnType("datetime")
-                    .HasColumnName("shopStartTime");
-            });
-
-            modelBuilder.Entity<VoucherOfshop>(entity =>
-            {
-                entity.HasKey(e => e.VoucherId);
-
-                entity.ToTable("VoucherOFShop");
-
-                entity.Property(e => e.VoucherId).HasColumnName("voucherId");
-
-                entity.Property(e => e.Status).HasColumnName("status");
-
-                entity.Property(e => e.VoucherEnd)
-                    .HasColumnType("datetime")
-                    .HasColumnName("voucherEnd");
-
-                entity.Property(e => e.VoucherName)
-                    .HasMaxLength(50)
-                    .HasColumnName("voucherName");
-
-                entity.Property(e => e.VoucherStart)
-                    .HasColumnType("datetime")
-                    .HasColumnName("voucherStart");
-
-                entity.Property(e => e.VoucherValue).HasColumnName("voucherValue");
             });
 
             OnModelCreatingPartial(modelBuilder);
