@@ -27,8 +27,8 @@ namespace MilkStore.Controllers
                 if (loginInfo == null) {
                     return BadRequest("Login information cannot be null");
                 }
-                if (loginInfo.UserName == null) { 
-                    return BadRequest("Username cannot be empty");
+                if (loginInfo.Email == null) { 
+                    return BadRequest("Email cannot be empty");
                 }
                 if (loginInfo.Password == null) { 
                     return BadRequest("Password cannot be empty");
@@ -44,7 +44,7 @@ namespace MilkStore.Controllers
                     response = Ok(new { accessToken = accessToken });
                     return response;
                 }
-                return NotFound("Wrong username or password");
+                return NotFound("Wrong email or password");
             }
             catch (Exception ex)
             {

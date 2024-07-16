@@ -12,12 +12,15 @@ namespace MilkStore_DAL.Entities
         }
 
         public int OrderId { get; set; }
-        public int AccountId { get; set; }
+        public int CustomerId { get; set; }
+        public int? VoucherId { get; set; }
+        public int? ExchangedPoint { get; set; }
         public DateTime OrderDate { get; set; }
         public double TotalPrice { get; set; }
         public int Status { get; set; }
 
-        public virtual Account Account { get; set; } = null!;
+        public virtual Customer Customer { get; set; } = null!;
+        public virtual VoucherOfShop? Voucher { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
         public virtual ICollection<Payment> Payments { get; set; }
     }

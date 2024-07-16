@@ -37,7 +37,7 @@ namespace MilkStore_BAL.Services.Implements
             {
                 UserAuthenticatingDtoResponse response = new UserAuthenticatingDtoResponse();
                 string hashedPassword = await HashPassword(loginInfo.Password);
-                var account = (await _unitOfWork.AccountRepository.FindAsync(a => a.UserName == loginInfo.UserName && a.Password == hashedPassword)).FirstOrDefault();
+                var account = (await _unitOfWork.AccountRepository.FindAsync(a => a.Email == loginInfo.Email && a.Password == hashedPassword)).FirstOrDefault();
                 if (account != null)
                 {
                     response = _mapper.Map<UserAuthenticatingDtoResponse>(account);

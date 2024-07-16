@@ -8,12 +8,8 @@ GO
 CREATE TABLE [dbo].[Account](
 	[accountId] [int] IDENTITY NOT NULL,
 	[roleId] [int] NOT NULL,
-	[userName] [nvarchar](50) NOT NULL,
-	[Phone] [nvarchar](10),
-	[Address] [nvarchar](30) ,
-	[dob] [date],
 	[Email] [nvarchar](30) NOT NULL,
-	[password] [nvarchar](30) NOT NULL,
+	[password] [nvarchar](Max) NOT NULL,
 	[status] [Bit] NOT NULL,
     CONSTRAINT [PK_Account] PRIMARY KEY CLUSTERED 
 (
@@ -21,11 +17,32 @@ CREATE TABLE [dbo].[Account](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+GO
+CREATE TABLE [dbo].[Customer](
+	[customerId] [int] IDENTITY NOT NULL,
+	[accountId] [int] NOT NULL,
+	[userName] [nvarchar](50) NOT NULL,
+	[Phone] [nvarchar](10),
+	[Address] [nvarchar](30) ,
+	[dob] [date],
+	[point] [int],
+	[status] [Bit] NOT NULL,
+    CONSTRAINT [PK_Customer] PRIMARY KEY CLUSTERED 
+(
+	[customerId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+GO
+ALTER TABLE [dbo].[Customer]  WITH CHECK ADD  CONSTRAINT [FK_Customer_Account] FOREIGN KEY([accountId])
+REFERENCES [dbo].[Account] ([accountId])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
 Go
 CREATE TABLE [dbo].[ProductCategory](
 	[productCategoryId] [int] IDENTITY NOT NULL,
 	[productCategoryName] [nvarchar](50)	NOT NULL,
-	[imageProduct] [nvarchar](250) NOT NULL,
 	 CONSTRAINT [PK_ProductCategory] PRIMARY KEY CLUSTERED 
 (
 	[productCategoryId] ASC
@@ -54,11 +71,8 @@ Go
 GO
 CREATE TABLE [dbo].[ImageProduct](
 	[imageId] [int] IDENTITY NOT NULL,
-	[imageContent] [nvarchar](250)	NOT NULL,
 	[productId] [int] NOT NULL,
-	[productPrice] [float] NOT NULL,
-	[productQuatity] [DateTime] NOT NULL,
-	[imageProduct] [nvarchar](250) NOT NULL,
+	[imageProduct] [nvarchar](Max) NOT NULL,
 	 CONSTRAINT [PK_ImageProduct] PRIMARY KEY CLUSTERED 
 (
 	[imageId] ASC
@@ -74,7 +88,7 @@ GO
 CREATE TABLE [dbo].[Cart](
 	[cartId] [int] IDENTITY NOT NULL,
 	[productId] [int] NOT NULL,
-	[accountId] [int] NOT NULL,
+	[customerId] [int] NOT NULL,
 	[cartQuantity] [int] NOT NULL,
 	[status] [bit] NOT NULL,
 	 CONSTRAINT [PK_Cart] PRIMARY KEY CLUSTERED 
@@ -88,18 +102,17 @@ REFERENCES [dbo].[Product] ([productId])
 ON UPDATE CASCADE
 ON DELETE CASCADE
 GO
-ALTER TABLE [dbo].[Cart]  WITH CHECK ADD  CONSTRAINT [FK_Cart_Account] FOREIGN KEY([accountId])
-REFERENCES [dbo].[Account] ([accountId])
+ALTER TABLE [dbo].[Cart]  WITH CHECK ADD  CONSTRAINT [FK_Cart_Customer] FOREIGN KEY([customerId])
+REFERENCES [dbo].[Customer] ([customerId])
 ON UPDATE NO ACTION
 ON DELETE NO ACTION
 GO
 GO
 CREATE TABLE [dbo].[Blog](
 	[blogId] [int] IDENTITY NOT NULL,
-	[accountId] [int] NOT NULL,
-	[blogName] [nvarchar](50) NOT NULL,
+	[blogTitle] [nvarchar](50) NOT NULL,
 	[blogContent] [nvarchar](350) NOT NULL,
-	[blogImage] [nvarchar](250) NOT NULL,
+	[blogImage] [nvarchar](MAX),
 	[status] [bit] NOT NULL,
 	 CONSTRAINT [PK_Blog] PRIMARY KEY CLUSTERED 
 (
@@ -107,16 +120,47 @@ CREATE TABLE [dbo].[Blog](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+CREATE TABLE [dbo].[BlogProduct](
+	[blogProductId] [int] IDENTITY NOT NULL,
+	[blogId] [int]  NOT NULL,
+	[productId] [int] NOT NULL,
+	[status] [bit] NOT NULL,
+	 CONSTRAINT [PK_BlogProduct] PRIMARY KEY CLUSTERED 
+(
+	[blogId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[Blog]  WITH CHECK ADD  CONSTRAINT [FK_Blog_Account] FOREIGN KEY([accountId])
-REFERENCES [dbo].[Account] ([accountId])
+ALTER TABLE [dbo].[BlogProduct]  WITH CHECK ADD  CONSTRAINT [FK_BlogProduct_Product] FOREIGN KEY([productId])
+REFERENCES [dbo].[Product] ([productId])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+ALTER TABLE [dbo].[BlogProduct]  WITH CHECK ADD  CONSTRAINT [FK_BlogProduct_Blog] FOREIGN KEY([blogId])
+REFERENCES [dbo].[Blog] ([blogId])
 ON UPDATE CASCADE
 ON DELETE CASCADE
 GO
 GO
+CREATE TABLE [dbo].[VoucherOfShop](
+	[voucherId] [int] IDENTITY NOT NULL,
+	[voucherValue] [float] NOT NULL,
+	[StartDate] [Date] NOT NULL,
+	[voucherQuantity] int NOT NULL,
+	[EndDate] [Date] NOT NULL,
+	[status] [bit] NOT NULL,
+	 CONSTRAINT [PK_VoucherOfShop] PRIMARY KEY CLUSTERED 
+(
+	[voucherId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+GO
 CREATE TABLE [dbo].[Order](
 	[orderId] [int] IDENTITY NOT NULL,
-	[accountId] [int] NOT NULL,
+	[customerId] [int] NOT NULL,
+	[voucherId] int,
+	[exchangedPoint] int,
 	[orderDate] [DateTime] NOT NULL,
 	[TotalPrice] [float] NOT NULL,
 	[status] [int] NOT NULL,
@@ -127,8 +171,14 @@ CREATE TABLE [dbo].[Order](
 ) ON [PRIMARY]
 GO
 GO
-ALTER TABLE [dbo].[Order]  WITH CHECK ADD  CONSTRAINT [FK_Order_Account] FOREIGN KEY([accountId])
-REFERENCES [dbo].[Account] ([accountId])
+ALTER TABLE [dbo].[Order]  WITH CHECK ADD  CONSTRAINT [FK_Order_Customer] FOREIGN KEY([customerId])
+REFERENCES [dbo].[Customer] ([customerId])
+ON UPDATE CASCADE
+ON DELETE CASCADE
+GO
+GO
+ALTER TABLE [dbo].[Order]  WITH CHECK ADD  CONSTRAINT [FK_Order_VoucherOfShop] FOREIGN KEY([voucherId])
+REFERENCES [dbo].[VoucherOfShop] ([voucherId])
 ON UPDATE CASCADE
 ON DELETE CASCADE
 GO
@@ -156,12 +206,13 @@ REFERENCES [dbo].[Order] ([orderId])
 ON UPDATE NO ACTION
 ON DELETE NO ACTION
 GO
+
 GO
 CREATE TABLE [dbo].[Feedback](
 	[feedbackId] [int] IDENTITY NOT NULL,
-	[accountId] [int] NOT NULL,
+	[customerId] [int] NOT NULL,
 	[productId] [int] NOT NULL,
-	[content] [nvarchar](250) NOT NULL,
+	[feedbackContent] [nvarchar](250) NOT NULL,
     [rateNumber] [float] NOT NULL,
 	[status] [bit] NOT NULL,
 	 CONSTRAINT [PK_Feedback] PRIMARY KEY CLUSTERED 
@@ -171,8 +222,8 @@ CREATE TABLE [dbo].[Feedback](
 ) ON [PRIMARY]
 GO
 GO
-ALTER TABLE [dbo].[Feedback]  WITH CHECK ADD  CONSTRAINT [FK_Comment_Account] FOREIGN KEY([accountId])
-REFERENCES [dbo].[Account] ([accountId])
+ALTER TABLE [dbo].[Feedback]  WITH CHECK ADD  CONSTRAINT [FK_Comment_Customer] FOREIGN KEY([customerId])
+REFERENCES [dbo].[Customer] ([customerId])
 ON UPDATE CASCADE
 ON DELETE CASCADE
 GO
@@ -193,9 +244,10 @@ create table Payments (
 	TransactionNo NVARCHAR(MAX) NOT NULL,
 	TransactionStatus INT NOT NULL,
 	PaymentAmount DECIMAL(13,2) NOT NULL,
-	[orderId] INT,
-	CONSTRAINT FK_OrderId_Payments FOREIGN KEY ([orderId]) REFERENCES [dbo].[Order]([orderId])
+	orderId INT,
+	CONSTRAINT FK_OrderId_Payments FOREIGN KEY (OrderId) REFERENCES [dbo].[Order](orderId)
 )
+GO
 --GO
 --CREATE TABLE [dbo].[Rating](
 --	[rateId] [int] IDENTITY NOT NULL,

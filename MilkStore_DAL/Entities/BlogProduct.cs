@@ -3,15 +3,14 @@ using System.Collections.Generic;
 
 namespace MilkStore_DAL.Entities
 {
-    public partial class Cart
+    public partial class BlogProduct
     {
-        public int CartId { get; set; }
+        public int BlogProductId { get; set; }
+        public int BlogId { get; set; }
         public int ProductId { get; set; }
-        public int CustomerId { get; set; }
-        public int CartQuantity { get; set; }
         public bool Status { get; set; }
 
-        public virtual Customer Customer { get; set; } = null!;
+        public virtual Blog Blog { get; set; } = null!;
         public virtual Product Product { get; set; } = null!;
     }
 }

@@ -34,5 +34,11 @@ namespace MilkStore_DAL.UnitOfWorks.Interfaces
         IGenericRepository<ImageProduct> ImageProductRepository { get; }
 
         IGenericRepository<Payment> PaymentRepository { get; }
+
+        IGenericRepository<Customer> CustomerRepository { get; }
+
+        IGenericRepository<BlogProduct> BlogProductRepository { get; }
+
+        IGenericRepository<VoucherOfShop> VoucherOfShopRepository { get; }
     }
 }

@@ -25,6 +25,9 @@ namespace MilkStore_DAL.UnitOfWorks.Implements
         private GenericRepository<ProductCategory> _productCategoryRepository;
         private GenericRepository<ImageProduct> _imageProductRepository;
         private GenericRepository<Payment> _paymentRepository;
+        private GenericRepository<Customer> _customerRepository;
+        private GenericRepository<BlogProduct> _blogProductRepository;
+        private GenericRepository<VoucherOfShop> _voucherOfShopRepository;
 
         public UnitOfWork(MomAndKidsContext context)
         {
@@ -50,6 +53,12 @@ namespace MilkStore_DAL.UnitOfWorks.Implements
         public IGenericRepository<ImageProduct> ImageProductRepository => _imageProductRepository ??= new GenericRepository<ImageProduct>(_context);
 
         public IGenericRepository<Payment> PaymentRepository => _paymentRepository ??= new GenericRepository<Payment>(_context);
+
+        public IGenericRepository<Customer> CustomerRepository => _customerRepository ??= new GenericRepository<Customer>(_context);
+
+        public IGenericRepository<BlogProduct> BlogProductRepository => _blogProductRepository ??=new GenericRepository<BlogProduct>(_context);
+
+        public IGenericRepository<VoucherOfShop> VoucherOfShopRepository => _voucherOfShopRepository ??= new GenericRepository<VoucherOfShop>(_context);
 
         public IDbContextTransaction BeginTransaction()
         {

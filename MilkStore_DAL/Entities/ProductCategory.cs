@@ -12,7 +12,6 @@ namespace MilkStore_DAL.Entities
 
         public int ProductCategoryId { get; set; }
         public string ProductCategoryName { get; set; } = null!;
-        public string ImageProduct { get; set; } = null!;
 
         public virtual ICollection<Product> Products { get; set; }
     }
