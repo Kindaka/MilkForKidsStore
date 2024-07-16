@@ -12,5 +12,9 @@ namespace MilkStore_BAL.Services.Interfaces
         Task<UserAuthenticatingDtoResponse?> AuthenticateUser(UserAuthenticatingDtoRequest loginInfo);
 
         Task<string> GenerateAccessToken(UserAuthenticatingDtoResponse account);
+
+        Task<bool> GetAccountByEmail(string email);
+
+        Task<bool> CreateAccountCustomer(UserRegisterDtoRequest request);
     }
 }

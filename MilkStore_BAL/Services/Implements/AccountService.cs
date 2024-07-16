@@ -13,6 +13,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -51,6 +52,50 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
+        public async Task<bool> CreateAccountCustomer(UserRegisterDtoRequest newAccount)
+        {
+            try
+            {
+                bool status = false;
+                newAccount.Password = await HashPassword(newAccount.Password);
+                var account = _mapper.Map<Account>(newAccount);
+                account.Status = true;
+                account.RoleId = 3;
+                await _unitOfWork.AccountRepository.AddAsync(account);
+                await _unitOfWork.SaveAsync();
+                var insertedAccount = (await _unitOfWork.AccountRepository.FindAsync(a => a.Email == newAccount.Email)).FirstOrDefault();
+                if (insertedAccount != null)
+                {
+                    
+                    var customer = new Customer
+                    {
+                        AccountId = insertedAccount.AccountId,
+                        UserName = newAccount.UserName,
+                        Phone = newAccount.Phone,
+                        Address = newAccount.Address,
+                        Dob = newAccount.Dob,
+                        Point = 0,
+                        Status = true
+                    };
+                    await _unitOfWork.CustomerRepository.AddAsync(customer);
+                    await _unitOfWork.SaveAsync();
+                    status = true;
+                    return status;
+                }
+                return status;
+            }
+            catch (Exception ex)
+            {
+                var insertedAccount = (await _unitOfWork.AccountRepository.FindAsync(a => a.Email == newAccount.Email)).FirstOrDefault();
+                if (insertedAccount != null)
+                {
+                    await _unitOfWork.AccountRepository.DeleteAsync(insertedAccount);
+                    await _unitOfWork.SaveAsync();
+                }
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<string> GenerateAccessToken(UserAuthenticatingDtoResponse account)
         {
             try
@@ -66,6 +111,26 @@ namespace MilkStore_BAL.Services.Implements
                 var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);
                 var accessToken = new JwtSecurityTokenHandler().WriteToken(accessJwt);
                 return accessToken;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> GetAccountByEmail(string email)
+        {
+            try
+            {
+                var account = (await _unitOfWork.AccountRepository.GetAsync(c => c.Email == email)).FirstOrDefault();
+                if (account == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
             catch (Exception ex)
             {
