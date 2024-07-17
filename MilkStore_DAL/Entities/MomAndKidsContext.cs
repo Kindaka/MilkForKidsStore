@@ -45,7 +45,7 @@ namespace MilkStore_DAL.Entities
 
                 entity.Property(e => e.AccountId).HasColumnName("accountId");
 
-                entity.Property(e => e.Email).HasMaxLength(30);
+                entity.Property(e => e.Email).HasMaxLength(64);
 
                 entity.Property(e => e.Password).HasColumnName("password");
 
@@ -75,31 +75,27 @@ namespace MilkStore_DAL.Entities
 
             modelBuilder.Entity<BlogProduct>(entity =>
             {
-                entity.HasKey(e => e.BlogId);
-
                 entity.ToTable("BlogProduct");
 
-                entity.Property(e => e.BlogId)
-                    .ValueGeneratedNever()
-                    .HasColumnName("blogId");
+                entity.Property(e => e.BlogProductId).HasColumnName("blogProductId");
 
-                entity.Property(e => e.BlogProductId)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("blogProductId");
+                entity.Property(e => e.BlogId).HasColumnName("blogId");
 
                 entity.Property(e => e.ProductId).HasColumnName("productId");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Blog)
-                    .WithOne(p => p.BlogProduct)
-                    .HasForeignKey<BlogProduct>(d => d.BlogId)
-                    .HasConstraintName("FK_BlogProduct_Blog");
+                    .WithMany(p => p.BlogProducts)
+                    .HasForeignKey(d => d.BlogId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_blogId_BlogProduct");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.BlogProducts)
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK_BlogProduct_Product");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_productId_BlogProduct");
             });
 
             modelBuilder.Entity<Cart>(entity =>
@@ -120,17 +116,21 @@ namespace MilkStore_DAL.Entities
                     .WithMany(p => p.Carts)
                     .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Cart_Customer");
+                    .HasConstraintName("FK_customerId_Cart");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.Carts)
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK_Cart_Product");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_productId_Cart");
             });
 
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.ToTable("Customer");
+
+                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F049289FD")
+                    .IsUnique();
 
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
 
@@ -153,22 +153,27 @@ namespace MilkStore_DAL.Entities
                     .HasColumnName("userName");
 
                 entity.HasOne(d => d.Account)
-                    .WithMany(p => p.Customers)
-                    .HasForeignKey(d => d.AccountId)
-                    .HasConstraintName("FK_Customer_Account");
+                    .WithOne(p => p.Customer)
+                    .HasForeignKey<Customer>(d => d.AccountId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_accountId_Customer");
             });
 
             modelBuilder.Entity<Feedback>(entity =>
             {
-                entity.ToTable("Feedback");
+                entity.HasNoKey();
 
-                entity.Property(e => e.FeedbackId).HasColumnName("feedbackId");
+                entity.ToTable("Feedback");
 
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
 
                 entity.Property(e => e.FeedbackContent)
                     .HasMaxLength(250)
                     .HasColumnName("feedbackContent");
+
+                entity.Property(e => e.FeedbackId)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("feedbackId");
 
                 entity.Property(e => e.ProductId).HasColumnName("productId");
 
@@ -177,19 +182,22 @@ namespace MilkStore_DAL.Entities
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Customer)
-                    .WithMany(p => p.Feedbacks)
+                    .WithMany()
                     .HasForeignKey(d => d.CustomerId)
-                    .HasConstraintName("FK_Comment_Customer");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_customerId_Feedback");
 
                 entity.HasOne(d => d.Product)
-                    .WithMany(p => p.Feedbacks)
+                    .WithMany()
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK_Comment_Product");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_productId_Feedback");
             });
 
             modelBuilder.Entity<ImageProduct>(entity =>
             {
-                entity.HasKey(e => e.ImageId);
+                entity.HasKey(e => e.ImageId)
+                    .HasName("PK__ImagePro__336E9B55BDDD22E7");
 
                 entity.ToTable("ImageProduct");
 
@@ -202,7 +210,8 @@ namespace MilkStore_DAL.Entities
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ImageProducts)
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK_ImageProduct_Product");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_productId_ImageProduct");
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -221,18 +230,20 @@ namespace MilkStore_DAL.Entities
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
+                entity.Property(e => e.TotalPrice).HasColumnType("decimal(13, 2)");
+
                 entity.Property(e => e.VoucherId).HasColumnName("voucherId");
 
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CustomerId)
-                    .HasConstraintName("FK_Order_Customer");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_customerId_Order");
 
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.VoucherId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("FK_Order_VoucherOfShop");
+                    .HasConstraintName("FK_voucherId_Order");
             });
 
             modelBuilder.Entity<OrderDetail>(entity =>
@@ -255,16 +266,22 @@ namespace MilkStore_DAL.Entities
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_OrderDetail_Order");
+                    .HasConstraintName("FK_orderId_OrderDetail");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.ProductId)
-                    .HasConstraintName("FK_OrderDetail_Product");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_productId_OrderDetail");
             });
 
             modelBuilder.Entity<Payment>(entity =>
             {
+                entity.ToTable("Payment");
+
+                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335CB53CCAE7")
+                    .IsUnique();
+
                 entity.Property(e => e.OrderId).HasColumnName("orderId");
 
                 entity.Property(e => e.PayDate).HasColumnType("datetime");
@@ -274,9 +291,10 @@ namespace MilkStore_DAL.Entities
                 entity.Property(e => e.PaymentMethod).HasMaxLength(100);
 
                 entity.HasOne(d => d.Order)
-                    .WithMany(p => p.Payments)
-                    .HasForeignKey(d => d.OrderId)
-                    .HasConstraintName("FK_OrderId_Payments");
+                    .WithOne(p => p.Payment)
+                    .HasForeignKey<Payment>(d => d.OrderId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_orderId_Payments");
             });
 
             modelBuilder.Entity<Product>(entity =>
@@ -295,14 +313,17 @@ namespace MilkStore_DAL.Entities
                     .HasMaxLength(50)
                     .HasColumnName("productName");
 
-                entity.Property(e => e.ProductPrice).HasColumnName("productPrice");
+                entity.Property(e => e.ProductPrice)
+                    .HasColumnType("decimal(13, 2)")
+                    .HasColumnName("productPrice");
 
                 entity.Property(e => e.ProductQuatity).HasColumnName("productQuatity");
 
                 entity.HasOne(d => d.ProductCategory)
                     .WithMany(p => p.Products)
                     .HasForeignKey(d => d.ProductCategoryId)
-                    .HasConstraintName("FK_Product_pRODUCTcATEGORY");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_productCategoryId_Product");
             });
 
             modelBuilder.Entity<ProductCategory>(entity =>
@@ -318,7 +339,8 @@ namespace MilkStore_DAL.Entities
 
             modelBuilder.Entity<VoucherOfShop>(entity =>
             {
-                entity.HasKey(e => e.VoucherId);
+                entity.HasKey(e => e.VoucherId)
+                    .HasName("PK__VoucherO__F53389E9F145F764");
 
                 entity.ToTable("VoucherOfShop");
 

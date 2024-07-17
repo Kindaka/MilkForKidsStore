@@ -9,7 +9,6 @@ namespace MilkStore_DAL.Entities
         {
             BlogProducts = new HashSet<BlogProduct>();
             Carts = new HashSet<Cart>();
-            Feedbacks = new HashSet<Feedback>();
             ImageProducts = new HashSet<ImageProduct>();
             OrderDetails = new HashSet<OrderDetail>();
         }
@@ -18,13 +17,12 @@ namespace MilkStore_DAL.Entities
         public int ProductCategoryId { get; set; }
         public string ProductName { get; set; } = null!;
         public string ProductInfor { get; set; } = null!;
-        public double ProductPrice { get; set; }
+        public decimal ProductPrice { get; set; }
         public int ProductQuatity { get; set; }
 
         public virtual ProductCategory ProductCategory { get; set; } = null!;
         public virtual ICollection<BlogProduct> BlogProducts { get; set; }
         public virtual ICollection<Cart> Carts { get; set; }
-        public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<ImageProduct> ImageProducts { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }
