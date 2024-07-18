@@ -62,6 +62,8 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IChatService, ChatService>(); 
 builder.Services.AddScoped<IVoucherOfShopService, VoucherOfShopService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // Configure Firebase
 FirebaseApp.Create(new AppOptions()

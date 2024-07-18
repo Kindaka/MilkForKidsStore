@@ -11,7 +11,7 @@ namespace MilkStore_DAL.UnitOfWorks.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IDbContextTransaction BeginTransaction();
+        Task<IDbContextTransaction> BeginTransactionAsync();
 
         Task SaveAsync();
 

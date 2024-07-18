@@ -24,7 +24,7 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<bool> AddNewProduct(Product product, List<string> imagePaths)
         {
-            using (var transaction = _unitOfWork.BeginTransaction())
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
@@ -72,7 +72,7 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<(bool checkDelete, List<string>? oldImagePaths)> DeleteProduct(int id)
         {
-            using (var transaction = _unitOfWork.BeginTransaction())
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
@@ -224,7 +224,7 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<(bool check, List<string>? oldImagePaths)> UpdateProduct(ProductDtoRequest request, List<string> imagePaths, int id)
         {
-            using (var transaction = _unitOfWork.BeginTransaction())
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
