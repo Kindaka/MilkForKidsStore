@@ -226,7 +226,22 @@ namespace MilkStore.Controllers
         {
             try
             {
-                if (await _productService.DeleteProduct(id))
+                var checkSuccess = await _productService.DeleteProduct(id);
+                if (checkSuccess.checkDelete && checkSuccess.oldImagePaths != null)
+                {
+                    if (checkSuccess.oldImagePaths.Any())
+                    {
+                        foreach (var oldImagePath in checkSuccess.oldImagePaths)
+                        {
+                            var fullImagePath = Path.Combine(_imagesDirectory, oldImagePath);
+                            if (System.IO.File.Exists(fullImagePath))
+                            {
+                                System.IO.File.Delete(fullImagePath);
+                            }
+                        }
+                    }
+                }
+                if (checkSuccess.checkDelete)
                 {
                     return Ok("Delete successfully");
                 }

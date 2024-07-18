@@ -70,7 +70,7 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
-        public async Task<bool> DeleteProduct(int id)
+        public async Task<(bool checkDelete, List<string>? oldImagePaths)> DeleteProduct(int id)
         {
             using (var transaction = _unitOfWork.BeginTransaction())
             {
@@ -80,22 +80,24 @@ namespace MilkStore_BAL.Services.Implements
                     if (checkProduct != null)
                     {
                         var Images = (await _unitOfWork.ImageProductRepository.GetAsync(p => p.ProductId == checkProduct.ProductId)).ToList();
+                        var currentImagePaths = new List<string>();
                         if (Images.Any())
                         {
                             foreach (var image in Images)
                             {
                                 await _unitOfWork.ImageProductRepository.DeleteAsync(image);
                                 await _unitOfWork.SaveAsync();
+                                currentImagePaths.Add(image.ImageProduct1);
                             }
                         }
                         await _unitOfWork.ProductRepository.DeleteAsync(checkProduct);
                         await _unitOfWork.SaveAsync();
                         await transaction.CommitAsync();
-                        return true;
+                        return (true, currentImagePaths);
                     }
                     else
                     {
-                        return false;
+                        return (false, null);
                     }
                 }
                 catch (Exception ex)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MilkStore_BAL.ModelViews.AccountDTOs;
+using MilkStore_BAL.ModelViews.CartDTOs;
 using MilkStore_BAL.ModelViews.ProductDTOs;
 using MilkStore_BAL.ModelViews.VoucherOfShopDTOs;
 using MilkStore_DAL.Entities;
@@ -23,6 +24,8 @@ namespace MilkStore_BAL.Mapper
             CreateMap<VoucherOfShop, VoucherOfShopDtoRequest>().ReverseMap();
             CreateMap<VoucherOfShop, VoucherOfShopDtoResponse>().ReverseMap();
             CreateMap<VoucherOfShop, VoucherOfShopDtoResponseForAdmin>().ReverseMap();
+            CreateMap<Cart, CartDtoRequest>().ReverseMap();
+            CreateMap<Cart, CartDtoResponse>().ReverseMap();
         }
     }
 }
