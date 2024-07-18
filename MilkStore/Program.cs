@@ -60,6 +60,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IChatService, ChatService>();  // Thêm dịch vụ chat
+builder.Services.AddScoped<IVoucherOfShopService, VoucherOfShopService>();
 
 // Configure Firebase
 FirebaseApp.Create(new AppOptions()
