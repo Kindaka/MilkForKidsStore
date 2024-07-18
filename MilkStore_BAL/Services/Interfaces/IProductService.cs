@@ -23,6 +23,6 @@ namespace MilkStore_BAL.Services.Interfaces
         Task<List<ProductDtoResponse>> Search(string searchInput);
 
         //Task<(bool checkDelete, List<string>? oldImagePaths)> DeleteProduct(int id);
-        Task<bool> UpdateProductStatusToFalse(int id);
+        Task<bool> UpdateProductStatus(int id);
     }
 }

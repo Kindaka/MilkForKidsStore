@@ -89,18 +89,18 @@ namespace MilkStore.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
-        {
-            try
-            {
-                await _categoryService.DeleteCategory(id);
-                return Ok("Delete category successfully");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
-            }
-        }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteCategory(int id)
+        //{
+        //    try
+        //    {
+        //        await _categoryService.DeleteCategory(id);
+        //        return Ok("Delete category successfully");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //    }
+        //}
     }
 }

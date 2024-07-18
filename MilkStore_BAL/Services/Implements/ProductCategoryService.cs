@@ -36,32 +36,32 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
-        public async Task DeleteCategory(int CategoryId)
-        {
-            try
-            {
-                var category = (await _unitOfWork.ProductCategoryRepository.FindAsync(c => c.ProductCategoryId == CategoryId)).FirstOrDefault();
-                if (category == null)
-                {
-                    throw new Exception("No category match this id");
-                }
-                else
-                {
-                    await _unitOfWork.ProductCategoryRepository.DeleteAsync(category);
-                    await _unitOfWork.SaveAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        //public async Task DeleteCategory(int CategoryId)
+        //{
+        //    try
+        //    {
+        //        var category = (await _unitOfWork.ProductCategoryRepository.FindAsync(c => c.ProductCategoryId == CategoryId)).FirstOrDefault();
+        //        if (category == null)
+        //        {
+        //            throw new Exception("No category match this id");
+        //        }
+        //        else
+        //        {
+        //            await _unitOfWork.ProductCategoryRepository.DeleteAsync(category);
+        //            await _unitOfWork.SaveAsync();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<List<CategoryDto>> GetAllCategories()
         {
             try
             {
-                var categoryes = await _unitOfWork.ProductCategoryRepository.GetAllAsync();
+                var categoryes = await _unitOfWork.ProductCategoryRepository.GetAllAsync(c => c.ProductCategoryStatus == true);
                 if (categoryes.Count() == 0)
                 {
                     return null;
@@ -84,7 +84,7 @@ namespace MilkStore_BAL.Services.Implements
         {
             try
             {
-                var category = await _unitOfWork.ProductCategoryRepository.GetByIDAsync(id);
+                var category = (await _unitOfWork.ProductCategoryRepository.GetAllAsync(filter: c => c.ProductCategoryStatus == true && c.ProductCategoryId == id)).FirstOrDefault();
                 if (category == null)
                 {
                     return null;

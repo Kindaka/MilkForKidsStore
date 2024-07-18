@@ -123,7 +123,7 @@ namespace MilkStore_BAL.Services.Implements
 
 
 
-        public async Task<bool> UpdateProductStatusToFalse(int id)
+        public async Task<bool> UpdateProductStatus(int id)
         {
             using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
@@ -132,13 +132,25 @@ namespace MilkStore_BAL.Services.Implements
                     var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
                     if (checkProduct != null)
                     {
-                       
-                        checkProduct.ProductStatus = false;
-                        await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
-                        await _unitOfWork.SaveAsync();
+                       if(checkProduct.ProductStatus == true)
+                       {
+                           checkProduct.ProductStatus = false;
+                           await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
+                           await _unitOfWork.SaveAsync();
 
-                        await transaction.CommitAsync();
-                        return true;
+                           await transaction.CommitAsync();
+                           return true;
+                       }
+                       else
+                       {
+                           checkProduct.ProductStatus = true;
+                           await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
+                           await _unitOfWork.SaveAsync();
+
+                           await transaction.CommitAsync();
+                           return true;
+                       }
+                        
                     }
                     else
                     {
@@ -200,11 +212,11 @@ namespace MilkStore_BAL.Services.Implements
                 var products = new List<Product>();
                 if (CategoryId == 0)
                 {
-                    products = (await _unitOfWork.ProductRepository.GetAsync()).ToList();
+                    products = (await _unitOfWork.ProductRepository.GetAsync(p => p.ProductStatus == true)).ToList();
                 }
                 else
                 {
-                    products = (await _unitOfWork.ProductRepository.GetAsync(p => p.ProductCategoryId == CategoryId)).ToList();
+                    products = (await _unitOfWork.ProductRepository.GetAsync(p => p.ProductStatus == true && p.ProductCategoryId == CategoryId)).ToList();
                 }
                 if (products.Any())
                 {
@@ -241,7 +253,7 @@ namespace MilkStore_BAL.Services.Implements
         {
             try
             {
-                var product = (await _unitOfWork.ProductRepository.GetAsync(filter: p => p.ProductId == id, includeProperties: "ProductCategory")).FirstOrDefault();
+                var product = (await _unitOfWork.ProductRepository.GetAsync(filter: p => p.ProductId == id && p.ProductStatus == true, includeProperties: "ProductCategory")).FirstOrDefault();
                 if (product != null)
                 {
                     var productView = _mapper.Map<ProductDtoResponse>(product);
@@ -275,7 +287,7 @@ namespace MilkStore_BAL.Services.Implements
         {
             try
             {
-                var products = (await _unitOfWork.ProductRepository.FindAsync(p => searchInput != null && p.ProductName.Contains(searchInput))).ToList();
+                var products = (await _unitOfWork.ProductRepository.FindAsync(p => searchInput != null && p.ProductStatus == true && p.ProductName.Contains(searchInput))).ToList();
                 if (products.Any())
                 {
                     List<ProductDtoResponse> list = new List<ProductDtoResponse>();

@@ -13,6 +13,6 @@ namespace MilkStore_BAL.Services.Interfaces
         Task<CategoryDto> GetCategoryById(int id);
         Task CreateCategory(CategoryDto request);
         Task UpdateCategory(int CategoryId, CategoryDto request);
-        Task DeleteCategory(int CategoryId);
+        //Task DeleteCategory(int CategoryId);
     }
 }

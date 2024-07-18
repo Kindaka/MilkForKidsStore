@@ -68,6 +68,8 @@ builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddScoped<IAdminService, AdminService>();
 
+builder.Services.AddCors();
+
 // Configure Firebase
 FirebaseApp.Create(new AppOptions()
 {

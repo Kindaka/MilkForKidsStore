@@ -252,40 +252,59 @@ namespace MilkStore.Controllers
             }
         }
 
-
-        [HttpDelete("delete-product/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPut("update-status/{id}")]
+        public async Task<IActionResult> UpdateStatus(int id)
         {
             try
             {
-                var checkSuccess = await _productService.DeleteProduct(id);
-                if (checkSuccess.checkDelete && checkSuccess.oldImagePaths != null)
+                var check = await _productService.UpdateProductStatus(id);
+                if(check)
                 {
-                    if (checkSuccess.oldImagePaths.Any())
-                    {
-                        foreach (var oldImagePath in checkSuccess.oldImagePaths)
-                        {
-                            var fullImagePath = Path.Combine(_imagesDirectory, oldImagePath);
-                            if (System.IO.File.Exists(fullImagePath))
-                            {
-                                System.IO.File.Delete(fullImagePath);
-                            }
-                        }
-                    }
-                }
-                if (checkSuccess.checkDelete)
-                {
-                    return Ok("Delete successfully");
+                    return Ok("Update successfully");
                 }
                 else
                 {
-                    return BadRequest("Product does not exist");
+                    return BadRequest("Update fail");
                 }
-            }
-            catch (Exception ex)
+            }catch (Exception ex)
             {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
+        //[HttpDelete("delete-product/{id}")]
+        //public async Task<IActionResult> Delete(int id)
+        //{
+        //    try
+        //    {
+        //        var checkSuccess = await _productService.DeleteProduct(id);
+        //        if (checkSuccess.checkDelete && checkSuccess.oldImagePaths != null)
+        //        {
+        //            if (checkSuccess.oldImagePaths.Any())
+        //            {
+        //                foreach (var oldImagePath in checkSuccess.oldImagePaths)
+        //                {
+        //                    var fullImagePath = Path.Combine(_imagesDirectory, oldImagePath);
+        //                    if (System.IO.File.Exists(fullImagePath))
+        //                    {
+        //                        System.IO.File.Delete(fullImagePath);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //        if (checkSuccess.checkDelete)
+        //        {
+        //            return Ok("Delete successfully");
+        //        }
+        //        else
+        //        {
+        //            return BadRequest("Product does not exist");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal Server Error: {ex.Message}");
+        //    }
+        //}
     }
 }
