@@ -60,9 +60,9 @@ namespace MilkStore_DAL.UnitOfWorks.Implements
 
         public IGenericRepository<VoucherOfShop> VoucherOfShopRepository => _voucherOfShopRepository ??= new GenericRepository<VoucherOfShop>(_context);
 
-        public IDbContextTransaction BeginTransaction()
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
-            return _context.Database.BeginTransaction();
+            return await _context.Database.BeginTransactionAsync();
         }
 
         public void Dispose()

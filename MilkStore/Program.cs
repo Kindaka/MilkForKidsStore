@@ -59,14 +59,19 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IChatService, ChatService>();  // Thêm dịch vụ chat
+builder.Services.AddScoped<IChatService, ChatService>(); 
 builder.Services.AddScoped<IVoucherOfShopService, VoucherOfShopService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+
 builder.Services.AddScoped<IAdminService, AdminService>();
 
 // Configure Firebase
 FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialPath"]),
+    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
 });
 
 // Configure Swagger

@@ -22,7 +22,6 @@ namespace MilkStore_BAL.VNPay
         public string? vnp_OrderType { get; set; }
         public string? vnp_ReturnUrl { get; set; }
         public string? vnp_TmnCode { get; set; }
-        public string? vnp_ExpireDate { get; set; }
         public string? vnp_TxnRef { get; set; }
         public string? vnp_Version { get; set; }
         public string? vnp_SecureHash { get; set; }
@@ -51,8 +50,6 @@ namespace MilkStore_BAL.VNPay
                 requestData.Add("vnp_ReturnUrl", vnp_ReturnUrl);
             if (vnp_TmnCode != null)
                 requestData.Add("vnp_TmnCode", vnp_TmnCode);
-            if (vnp_ExpireDate != null)
-                requestData.Add("vnp_ExpireDate", vnp_ExpireDate);
             if (vnp_TxnRef != null)
                 requestData.Add("vnp_TxnRef", vnp_TxnRef);
             if (vnp_Version != null)
@@ -75,7 +72,7 @@ namespace MilkStore_BAL.VNPay
         }
         public VNPayRequest(string version, string tmnCode, DateTime createDate, string ipAddress,
             decimal amount, string currCode, string orderType, string orderInfo,
-            string returnUrl, string txnRef, DateTime expireDate)
+            string returnUrl, string txnRef)
         {
             this.vnp_Locale = "vn";
             this.vnp_IpAddr = ipAddress;
@@ -89,7 +86,6 @@ namespace MilkStore_BAL.VNPay
             this.vnp_OrderInfo = orderInfo;
             this.vnp_ReturnUrl = returnUrl;
             this.vnp_TxnRef = txnRef;
-            this.vnp_ExpireDate = expireDate.ToString("yyyyMMddHHmmss");
         }
 
         private static String HmacSHA512(string key, string inputData)

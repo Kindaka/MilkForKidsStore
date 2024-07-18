@@ -12,6 +12,8 @@ namespace MilkStore_BAL.Services.Interfaces
     {
         Task<bool> AddNewProduct(Product product, List<string> imagePaths);
 
+        Task<bool> AddNewProductFireBase(Product product, List<Stream> imageStreams, List<string> imageFileNames);
+
         Task<List<ProductDtoResponse>> GetAllProducts(int CategoryId);
 
         Task<ProductDtoResponse> GetProductByID(int id);
@@ -20,6 +22,7 @@ namespace MilkStore_BAL.Services.Interfaces
 
         Task<List<ProductDtoResponse>> Search(string searchInput);
 
-        Task<bool> DeleteProduct(int id);
+        //Task<(bool checkDelete, List<string>? oldImagePaths)> DeleteProduct(int id);
+        Task<bool> UpdateProductStatusToFalse(int id);
     }
 }

@@ -129,7 +129,7 @@ namespace MilkStore_DAL.Entities
             {
                 entity.ToTable("Customer");
 
-                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F049289FD")
+                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F657BE16D")
                     .IsUnique();
 
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
@@ -197,7 +197,7 @@ namespace MilkStore_DAL.Entities
             modelBuilder.Entity<ImageProduct>(entity =>
             {
                 entity.HasKey(e => e.ImageId)
-                    .HasName("PK__ImagePro__336E9B55BDDD22E7");
+                    .HasName("PK__ImagePro__336E9B5588FD45C4");
 
                 entity.ToTable("ImageProduct");
 
@@ -279,7 +279,7 @@ namespace MilkStore_DAL.Entities
             {
                 entity.ToTable("Payment");
 
-                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335CB53CCAE7")
+                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335C92942E78")
                     .IsUnique();
 
                 entity.Property(e => e.OrderId).HasColumnName("orderId");
@@ -317,7 +317,9 @@ namespace MilkStore_DAL.Entities
                     .HasColumnType("decimal(13, 2)")
                     .HasColumnName("productPrice");
 
-                entity.Property(e => e.ProductQuatity).HasColumnName("productQuatity");
+                entity.Property(e => e.ProductQuantity).HasColumnName("productQuantity");
+
+                entity.Property(e => e.ProductStatus).HasColumnName("productStatus");
 
                 entity.HasOne(d => d.ProductCategory)
                     .WithMany(p => p.Products)
@@ -335,12 +337,14 @@ namespace MilkStore_DAL.Entities
                 entity.Property(e => e.ProductCategoryName)
                     .HasMaxLength(50)
                     .HasColumnName("productCategoryName");
+
+                entity.Property(e => e.ProductCategoryStatus).HasColumnName("productCategoryStatus");
             });
 
             modelBuilder.Entity<VoucherOfShop>(entity =>
             {
                 entity.HasKey(e => e.VoucherId)
-                    .HasName("PK__VoucherO__F53389E9F145F764");
+                    .HasName("PK__VoucherO__F53389E94E278163");
 
                 entity.ToTable("VoucherOfShop");
 
