@@ -10,5 +10,6 @@ namespace MilkStore_BAL.Services.Interfaces
     public interface IPaymentService
     {
         Task<PaymentDtoResponse> CreatePayment(PaymentDtoRequest paymentRequest);
+        Task<PaymentDtoResponse> CancelTransaction(PaymentDtoRequest paymentRequest);
     }
 }

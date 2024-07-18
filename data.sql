@@ -14,16 +14,16 @@ INSERT INTO [dbo].[Customer] (accountId, userName, Phone, Address, dob, point, s
 (4, 'Customer Two', '0987654321', '456 Elm St', '1992-02-02', 200, 1);
 
 -- Insert sample data into ProductCategory table
-INSERT INTO [dbo].[ProductCategory] (productCategoryName) VALUES 
-('Vinamilk'),
-('Nutifood'),
-('Abbott');
+INSERT INTO [dbo].[ProductCategory] (productCategoryName, productCategoryStatus) VALUES 
+('Vinamilk', 1),
+('Nutifood', 1),
+('Abbott', 1);
 
 -- Insert sample data into Product table
-INSERT INTO [dbo].[Product] (productCategoryId, productName, productInfor, productPrice, productQuatity) VALUES 
-(1, 'Milk 1', 'Use for kids.', 100000, 100),
-(2, 'Milk 2', 'Use for both adults and kids.', 340000, 50),
-(3, 'Milk 3', 'Use for adults only.', 240000, 200);
+INSERT INTO [dbo].[Product] (productCategoryId, productName, productInfor, productPrice, productQuantity, productStatus) VALUES 
+(1, 'Milk 1', 'Use for kids.', 100000, 100, 1),
+(2, 'Milk 2', 'Use for both adults and kids.', 340000, 50, 1),
+(3, 'Milk 3', 'Use for adults only.', 240000, 200, 1);
 
 -- Insert sample data into Cart table
 INSERT INTO [dbo].[Cart] (productId, customerId, cartQuantity, status) VALUES 

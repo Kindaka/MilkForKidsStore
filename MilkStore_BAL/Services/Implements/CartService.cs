@@ -38,7 +38,7 @@ namespace MilkStore_BAL.Services.Implements
                 else
                 {
                     var totalItem = existedItemInCart.CartQuantity + request.CartQuantity;
-                    if (existedItemInCart.Product.ProductQuatity > totalItem)
+                    if (existedItemInCart.Product.ProductQuantity > totalItem)
                     {
                         existedItemInCart.CartQuantity = totalItem;
                         await _unitOfWork.CartRepository.UpdateAsync(existedItemInCart);
@@ -124,7 +124,7 @@ namespace MilkStore_BAL.Services.Implements
                     var product = await _unitOfWork.ProductRepository.GetByIDAsync(cartItem.ProductId);
                     if (product != null)
                     {
-                        if (product.ProductQuatity < quantity)
+                        if (product.ProductQuantity < quantity)
                         {
                             return 2;
                         }

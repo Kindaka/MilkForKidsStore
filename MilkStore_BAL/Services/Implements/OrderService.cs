@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Azure;
 using Microsoft.Extensions.Configuration;
 using MilkStore_BAL.ModelViews.OrderDetailDTOs;
 using MilkStore_BAL.ModelViews.OrderDTOs;
+using MilkStore_BAL.ModelViews.ProductDTOs;
 using MilkStore_BAL.Services.Interfaces;
 using MilkStore_BAL.VNPay;
 using MilkStore_DAL.Entities;
@@ -11,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace MilkStore_BAL.Services.Implements
 {
@@ -129,11 +132,11 @@ namespace MilkStore_BAL.Services.Implements
                     foreach (var orderProduct in orderProducts)
                     {
                         var product = await _unitOfWork.ProductRepository.GetByIDAsync(orderProduct.ProductId);
-                        if (product.ProductQuatity < orderProduct.OrderQuantity)
+                        if (product.ProductQuantity < orderProduct.OrderQuantity)
                         {
                             throw new Exception("Not enough product in stock");
                         }
-                        product.ProductQuatity = product.ProductQuatity - orderProduct.OrderQuantity;
+                        product.ProductQuantity = product.ProductQuantity - orderProduct.OrderQuantity;
                         await _unitOfWork.ProductRepository.UpdateAsync(product);
                         await _unitOfWork.SaveAsync();
                     }
@@ -155,6 +158,88 @@ namespace MilkStore_BAL.Services.Implements
                     await transaction.RollbackAsync();
                     throw new Exception(ex.Message);
                 }
+            }
+        }
+
+        public async Task<List<OrderDtoResponse>> Get()
+        {
+            try {
+                var response = new List<OrderDtoResponse>();
+                var orders = await _unitOfWork.OrderRepository.GetAsync();
+                if (orders.Any())
+                {
+                    foreach (var order in orders)
+                    {
+                        var orderView = _mapper.Map<OrderDtoResponse>(order);
+                        response.Add(orderView);
+                    }
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<OrderDtoResponse?> Get(int id)
+        {
+            try
+            {
+                var order = await _unitOfWork.OrderRepository.GetByIDAsync(id);
+                if (order == null)
+                {
+                    return null;
+                }
+                var orderView = _mapper.Map<OrderDtoResponse>(order);
+                var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(od => od.OrderId == order.OrderId);
+                foreach (var orderDetail in orderDetails)
+                {
+                    var odView = _mapper.Map<OrderDetailDtoResponse>(orderDetail);
+                    var product = (await _unitOfWork.ProductRepository.GetAsync(p => p.ProductId == orderDetail.ProductId)).FirstOrDefault();
+                    var productView = _mapper.Map<ProductDtoResponse>(product);
+                    odView.product = _mapper.Map<ProductDtoResponse>(product);
+                    var productImages = await _unitOfWork.ImageProductRepository.GetAsync(p => p.ProductId == product.ProductId);
+                    if (productImages.Any())
+                    {
+                        foreach (var image in productImages)
+                        {
+                            var imageView = new ImageProductView
+                            {
+                                ImageProduct1 = image.ImageProduct1
+                            };
+                            odView.product.Images.Add(imageView);
+                        }
+                    }
+                    orderView.orderDetails.Add(odView);
+                }
+                return orderView;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<OrderDtoResponse>> GetByCustomerId(int customerId)
+        {
+            try
+            {
+                var response = new List<OrderDtoResponse>();
+                var orders = await _unitOfWork.OrderRepository.GetAsync(o => o.CustomerId == customerId);
+                if (orders.Any())
+                {
+                    foreach (var order in orders)
+                    {
+                        var orderView = _mapper.Map<OrderDtoResponse>(order);
+                        response.Add(orderView);
+                    }
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
 
@@ -193,13 +278,13 @@ namespace MilkStore_BAL.Services.Implements
                     }
                     else
                     {
-                        if (item.Product.ProductQuatity == 0)
+                        if (item.Product.ProductQuantity == 0)
                         {
                             return -2;
                         }
                         else
                         {
-                            if (cartItem.quantity > item.Product.ProductQuatity)
+                            if (cartItem.quantity > item.Product.ProductQuantity)
                             {
                                 return -3;
                             }

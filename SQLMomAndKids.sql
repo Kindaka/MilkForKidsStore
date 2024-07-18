@@ -34,7 +34,8 @@ GO
 
 CREATE TABLE [dbo].[ProductCategory](
 	[productCategoryId] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,
-	[productCategoryName] [nvarchar](50)	NOT NULL
+	[productCategoryName] [nvarchar](50)	NOT NULL,
+	[productCategoryStatus] [bit] NOT NULL
 )
 GO
 
@@ -44,7 +45,8 @@ CREATE TABLE [dbo].[Product](
 	[productName] [nvarchar](50)	NOT NULL,
 	[productInfor] [nvarchar](250) NOT NULL,
 	[productPrice] [decimal](13,2) NOT NULL CHECK ([productPrice] >= 0),
-	[productQuatity] [int] NOT NULL CHECK ([productQuatity] >= 0)
+	[productQuantity] [int] NOT NULL CHECK ([productQuantity] >= 0),
+	[productStatus] [bit] NOT NULL
 	CONSTRAINT FK_productCategoryId_Product FOREIGN KEY ([productCategoryId]) REFERENCES [dbo].[ProductCategory]([productCategoryId])
 )
 GO
@@ -125,15 +127,15 @@ GO
 CREATE TABLE [dbo].[Payment] (
 	PaymentId INT IDENTITY(1,1) PRIMARY KEY,
 	orderId INT UNIQUE NOT NULL,
-	PaymentMethod NVARCHAR(100) NOT NULL,
-	BankCode NVARCHAR(MAX) NOT NULL,
-	BankTranNo NVARCHAR(MAX) NOT NULL,
-	CardType NVARCHAR(MAX) NOT NULL,
+	PaymentMethod NVARCHAR(100),
+	BankCode NVARCHAR(MAX),
+	BankTranNo NVARCHAR(MAX),
+	CardType NVARCHAR(MAX),
 	PaymentInfo NVARCHAR(MAX),
 	PayDate DATETIME,
-	TransactionNo NVARCHAR(MAX) NOT NULL,
-	TransactionStatus INT NOT NULL,
-	PaymentAmount DECIMAL(13,2) NOT NULL,
+	TransactionNo NVARCHAR(MAX),
+	TransactionStatus INT,
+	PaymentAmount DECIMAL(13,2),
 	CONSTRAINT FK_orderId_Payments FOREIGN KEY (orderId) REFERENCES [dbo].[Order](orderId)
 )
 GO

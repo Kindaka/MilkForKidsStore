@@ -18,7 +18,8 @@ namespace MilkStore_DAL.Entities
         public string ProductName { get; set; } = null!;
         public string ProductInfor { get; set; } = null!;
         public decimal ProductPrice { get; set; }
-        public int ProductQuatity { get; set; }
+        public int ProductQuantity { get; set; }
+        public bool ProductStatus { get; set; }
 
         public virtual ProductCategory ProductCategory { get; set; } = null!;
         public virtual ICollection<BlogProduct> BlogProducts { get; set; }

@@ -13,5 +13,8 @@ namespace MilkStore_BAL.Services.Interfaces
         Task<string> CreateOrder(List<OrderProductDto> cartItems, int? voucherId, int exchangedPoint);
         Task<bool> CheckVoucher(int voucherId);
         Task<bool> ValidateExchangedPoint(int exchangedPoint, int customerId);
+        Task<List<OrderDtoResponse>> Get();
+        Task<OrderDtoResponse?> Get(int id);
+        Task<List<OrderDtoResponse>> GetByCustomerId(int customerId);
     }
 }

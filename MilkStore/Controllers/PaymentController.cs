@@ -23,7 +23,13 @@ namespace MilkStore.Controllers
             {
                 if (parameters.vnp_BankTranNo == null)
                 {
-                    return BadRequest("Transaction failed");
+                    var res = await _paymentService.CancelTransaction(parameters);
+                    if (res != null) { 
+                        return BadRequest(res);
+                    } else
+                    {
+                        return NotFound("Order does not created");
+                    }
                 }
                 var result = await _paymentService.CreatePayment(parameters);
 
