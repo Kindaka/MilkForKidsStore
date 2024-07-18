@@ -28,7 +28,7 @@ namespace MilkStore_BAL.Services.Implements
         {
             try
             {
-                using (var transaction = _unitOfWork.BeginTransaction())
+                using (var transaction = await _unitOfWork.BeginTransactionAsync())
                 {
                     try
                     {
@@ -62,7 +62,7 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<bool> LockAccount(int accountId)
         {
-            using (var transaction = _unitOfWork.BeginTransaction())
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
@@ -93,7 +93,7 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<bool> UnlockAccount(int accountId)
         {
-            using (var transaction = _unitOfWork.BeginTransaction())
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
                 try
                 {
