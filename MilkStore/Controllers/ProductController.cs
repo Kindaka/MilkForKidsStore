@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MilkStore_BAL.ModelViews.ProductDTOs;
@@ -7,7 +8,7 @@ using MilkStore_DAL.Entities;
 
 namespace MilkStore.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
@@ -24,7 +25,7 @@ namespace MilkStore.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("/api/v1/Products/CreateProduct")]
+        [HttpPost("add-product")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDtoRequest productView)
         {
             try
@@ -73,7 +74,38 @@ namespace MilkStore.Controllers
             }
         }
 
-        [HttpGet("/api/v1/Products")]
+        [Authorize]
+        [HttpPost("add-product-firebase")]
+        public async Task<IActionResult> AddProduct([FromForm] ProductDtoUsingFireBaseRequest request)
+        {
+            var product = _mapper.Map<Product>(request);
+
+            var imageStreams = new List<Stream>();
+            var imageFileNames = new List<string>();
+
+            foreach (var image in request.Images)
+            {
+                var ms = new MemoryStream();
+                await image.CopyToAsync(ms);
+                ms.Position = 0;
+                imageStreams.Add(ms);
+                imageFileNames.Add(image.FileName);
+            }
+
+            var result = await _productService.AddNewProductFireBase(product, imageStreams, imageFileNames);
+            if (result)
+            {
+                return Ok("Product added successfully");
+            }
+            else
+            {
+                return BadRequest("Failed to add product");
+            }
+        }
+
+
+
+        [HttpGet("get-all-products")]
         public async Task<IActionResult> GetAllProduct([FromQuery] int CategoryId)
         {
             var products = await _productService.GetAllProducts(CategoryId);
@@ -102,7 +134,7 @@ namespace MilkStore.Controllers
             }
         }
 
-        [HttpGet("/api/v1/product/{id}")]
+        [HttpGet("get-product-by-id/{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
             var product = await _productService.GetProductByID(id);
@@ -128,7 +160,7 @@ namespace MilkStore.Controllers
             }
         }
 
-        [HttpGet("/api/v1/product/search/{searchInput}")]
+        [HttpGet("search-product/{searchInput}")]
         public async Task<IActionResult> SearchProduct(string searchInput)
         {
             try
@@ -165,7 +197,7 @@ namespace MilkStore.Controllers
         }
 
 
-        [HttpPut("/api/v1/product/{id}")]
+        [HttpPut("update-product/{id}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDtoRequest productView, int id)
         {
             if (await _categoryService.GetCategoryById(productView.ProductCategoryId) == null)
@@ -221,7 +253,7 @@ namespace MilkStore.Controllers
         }
 
 
-        [HttpDelete("/api/v1/product/{id}")]
+        [HttpDelete("delete-product/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try

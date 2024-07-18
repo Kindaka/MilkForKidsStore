@@ -1,4 +1,4 @@
-﻿using MilkStore_DAL.Entities;
+﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MilkStore_BAL.ModelViews.ProductDTOs
 {
-    public class ProductDtoRequest
+    public class ProductDtoUsingFireBaseRequest
     {
         public int ProductCategoryId { get; set; }
         public string ProductName { get; set; } = null!;
@@ -16,6 +16,6 @@ namespace MilkStore_BAL.ModelViews.ProductDTOs
         public int ProductQuatity { get; set; }
         public bool ProductStatus { get; set; }
 
-        public List<ImageProductView> Images { get; set; } = new List<ImageProductView>();
+        public List<IFormFile>? Images { get; set; }
     }
 }

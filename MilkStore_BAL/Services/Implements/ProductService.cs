@@ -15,11 +15,61 @@ namespace MilkStore_BAL.Services.Implements
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
 
-        public ProductService(IUnitOfWork unitOfWork, IMapper mapper)
+
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, IImageService imageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _imageService = imageService;
+        }
+
+
+        public async Task<bool> AddNewProductFireBase(Product product, List<Stream> imageStreams, List<string> imageFileNames)
+        {
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
+            {
+                try
+                {
+                    bool status = false;
+                    var checkCategory = _unitOfWork.ProductCategoryRepository.GetByIDAsync(product.ProductCategoryId);
+                    if (checkCategory != null)
+                    {
+                        product.ProductStatus = true;
+                        await _unitOfWork.ProductRepository.AddAsync(product);
+                        await _unitOfWork.SaveAsync();
+
+                        if (imageStreams.Any() && imageFileNames.Any())
+                        {
+                            for (int i = 0; i < imageStreams.Count; i++)
+                            {
+                                var imageUrl = await _imageService.UploadImageAsync(imageStreams[i], imageFileNames[i]);
+                                var image = new ImageProduct
+                                {
+                                    ProductId = product.ProductId,
+                                    ImageProduct1 = imageUrl
+                                };
+                                await _unitOfWork.ImageProductRepository.AddAsync(image);
+                                await _unitOfWork.SaveAsync();
+                            }
+                        }
+
+                        status = true;
+                        await transaction.CommitAsync();
+                        return status;
+                    }
+                    else
+                    {
+                        return status;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         public async Task<bool> AddNewProduct(Product product, List<string> imagePaths)
@@ -32,6 +82,7 @@ namespace MilkStore_BAL.Services.Implements
                     var checkCategory = _unitOfWork.ProductCategoryRepository.GetByIDAsync(product.ProductCategoryId);
                     if (checkCategory != null)
                     {
+                        product.ProductStatus = true;
                         await _unitOfWork.ProductRepository.AddAsync(product);
                         await _unitOfWork.SaveAsync();
 
@@ -70,7 +121,9 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
-        public async Task<(bool checkDelete, List<string>? oldImagePaths)> DeleteProduct(int id)
+
+
+        public async Task<bool> UpdateProductStatusToFalse(int id)
         {
             using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
@@ -79,25 +132,17 @@ namespace MilkStore_BAL.Services.Implements
                     var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
                     if (checkProduct != null)
                     {
-                        var Images = (await _unitOfWork.ImageProductRepository.GetAsync(p => p.ProductId == checkProduct.ProductId)).ToList();
-                        var currentImagePaths = new List<string>();
-                        if (Images.Any())
-                        {
-                            foreach (var image in Images)
-                            {
-                                await _unitOfWork.ImageProductRepository.DeleteAsync(image);
-                                await _unitOfWork.SaveAsync();
-                                currentImagePaths.Add(image.ImageProduct1);
-                            }
-                        }
-                        await _unitOfWork.ProductRepository.DeleteAsync(checkProduct);
+                       
+                        checkProduct.ProductStatus = false;
+                        await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
                         await _unitOfWork.SaveAsync();
+
                         await transaction.CommitAsync();
-                        return (true, currentImagePaths);
+                        return true;
                     }
                     else
                     {
-                        return (false, null);
+                        return false;
                     }
                 }
                 catch (Exception ex)
@@ -107,6 +152,46 @@ namespace MilkStore_BAL.Services.Implements
                 }
             }
         }
+
+
+
+        //public async Task<(bool checkDelete, List<string>? oldImagePaths)> DeleteProduct(int id)
+        //{
+        //    using (var transaction = await _unitOfWork.BeginTransactionAsync())
+        //    {
+        //        try
+        //        {
+        //            var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
+        //            if (checkProduct != null)
+        //            {
+        //                var Images = (await _unitOfWork.ImageProductRepository.GetAsync(p => p.ProductId == checkProduct.ProductId)).ToList();
+        //                var currentImagePaths = new List<string>();
+        //                if (Images.Any())
+        //                {
+        //                    foreach (var image in Images)
+        //                    {
+        //                        await _unitOfWork.ImageProductRepository.DeleteAsync(image);
+        //                        await _unitOfWork.SaveAsync();
+        //                        currentImagePaths.Add(image.ImageProduct1);
+        //                    }
+        //                }
+        //                await _unitOfWork.ProductRepository.DeleteAsync(checkProduct);
+        //                await _unitOfWork.SaveAsync();
+        //                await transaction.CommitAsync();
+        //                return (true, currentImagePaths);
+        //            }
+        //            else
+        //            {
+        //                return (false, null);
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            await transaction.RollbackAsync();
+        //            throw new Exception(ex.Message);
+        //        }
+        //    }
+        //}
 
         public async Task<List<ProductDtoResponse>> GetAllProducts(int CategoryId)
         {

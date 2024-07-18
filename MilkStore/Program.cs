@@ -64,11 +64,13 @@ builder.Services.AddScoped<IVoucherOfShopService, VoucherOfShopService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IImageService, ImageService>();
+
 
 // Configure Firebase
 FirebaseApp.Create(new AppOptions()
 {
-    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:CredentialPath"]),
+    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
 });
 
 // Configure Swagger

@@ -23,6 +23,7 @@ namespace MilkStore_BAL.Mapper
             CreateMap<ProductCategory, CategoryDto>().ReverseMap();
             CreateMap<Product, ProductDtoResponse>().ReverseMap();
             CreateMap<Product, ProductDtoRequest>().ReverseMap();
+            CreateMap<Product, ProductDtoUsingFireBaseRequest>().ReverseMap();
             CreateMap<Account, UserRegisterDtoRequest>().ReverseMap();
             CreateMap<VoucherOfShop, VoucherOfShopDtoRequest>().ReverseMap();
             CreateMap<VoucherOfShop, VoucherOfShopDtoResponse>().ReverseMap();
