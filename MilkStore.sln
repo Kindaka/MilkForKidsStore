@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MilkStore_DAL", "MilkStore_
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MilkStore_BAL", "MilkStore_BAL\MilkStore_BAL.csproj", "{FA11F048-F506-44F4-8303-95AC7425196F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client_MilkForKidsStore", "Client_MilkForKidsStore\Client_MilkForKidsStore.csproj", "{B2231EB0-4D4C-48F6-89E4-F31D3D26332C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client_MilkForKidsStore", "Client_MilkForKidsStore\Client_MilkForKidsStore.csproj", "{B2231EB0-4D4C-48F6-89E4-F31D3D26332C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
