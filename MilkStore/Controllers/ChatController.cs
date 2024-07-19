@@ -54,5 +54,15 @@ namespace MilkStore.Controllers
             var messages = await _chatService.GetMessagesAsync(roomId);
             return Ok(messages);
         }
+
+        [Authorize]
+        [HttpGet("get-rooms")]
+        public async Task<IActionResult> GetRooms()
+        {
+            var rooms = await _chatService.GetAllRoomsAsync();
+            return Ok(rooms);
+        }
+
+
     }
 }

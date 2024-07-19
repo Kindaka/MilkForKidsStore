@@ -10,6 +10,7 @@ namespace MilkStore_BAL.Services.Interfaces
     public interface IChatService
     {
         Task<bool> RoomExistsAsync(string roomId);
+        Task<List<string>> GetAllRoomsAsync();
         Task<bool> IsAdminAsync(int accountId);
         Task<List<ChatMessage>> GetMessagesAsync(string roomId);
         Task SendMessageAsync(ChatMessage message);

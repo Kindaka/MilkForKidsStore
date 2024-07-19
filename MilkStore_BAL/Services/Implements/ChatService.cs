@@ -20,7 +20,7 @@ namespace MilkStore_BAL.Services.Implements
 
         public ChatService(ILogger<ChatService> logger, IUnitOfWork unitOfWork, IConfiguration configuration)
         {
-            _firebaseClient = new FirebaseClient(configuration["Firebase:DatabaseUrl"]);
+            _firebaseClient = new FirebaseClient(configuration["Firebase:Chat:DatabaseUrl"]);
             _logger = logger;
             _unitOfWork = unitOfWork;
         }
@@ -100,6 +100,36 @@ namespace MilkStore_BAL.Services.Implements
                 _logger.LogInformation("GetMessagesAsync took {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
             }
         }
+
+        public async Task<List<string>> GetAllRoomsAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            try
+            {
+                _logger.LogInformation("Getting all chat rooms");
+                var rooms = await _firebaseClient.Child("chatrooms").OnceAsync<object>();
+                var result = new List<string>();
+                foreach (var room in rooms)
+                {
+                    result.Add(room.Key);
+                }
+                _logger.LogInformation("Rooms retrieved successfully");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all chat rooms");
+                throw;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogInformation("GetAllRoomsAsync took {ElapsedMilliseconds} ms", stopwatch.ElapsedMilliseconds);
+            }
+        }
+
+
+
 
         public async Task<bool> RoomExistsAsync(string roomId)
         {

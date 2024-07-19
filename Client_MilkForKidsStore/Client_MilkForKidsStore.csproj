@@ -7,12 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <PackageReference Include="FirebaseAdmin" Version="3.0.0" />
+	  <PackageReference Include="FirebaseDatabase.net" Version="4.2.0" />
+	  <PackageReference Include="FirebaseDatabase.NetCore50" Version="4.0.6" />
+	  <PackageReference Include="Google.Apis.Auth" Version="1.68.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\login-form-14\.DS_Store" />
+    <None Include="wwwroot\login-form-14\css\.DS_Store" />
+    <None Include="wwwroot\login-form-14\css\bootstrap\.DS_Store" />
+    <None Include="wwwroot\login-form-14\css\bootstrap\mixins\.DS_Store" />
+    <None Include="wwwroot\login-form-14\fonts\.DS_Store" />
+    <None Include="wwwroot\login-form-14\images\.DS_Store" />
+    <None Include="wwwroot\login-form-14\js\.DS_Store" />
+    <None Include="wwwroot\login-form-14\scss\.DS_Store" />
+    <None Include="wwwroot\login-form-14\scss\bootstrap\.DS_Store" />
   </ItemGroup>
 
 </Project>
