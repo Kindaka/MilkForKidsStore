@@ -2,6 +2,8 @@
 using MilkStore_BAL.ModelViews.AccountDTOs;
 using MilkStore_BAL.ModelViews.CartDTOs;
 using MilkStore_BAL.ModelViews.ChatDTOs;
+using MilkStore_BAL.ModelViews.BlogDTOs;
+using MilkStore_BAL.ModelViews.FeedbackDTOs;
 using MilkStore_BAL.ModelViews.OrderDetailDTOs;
 using MilkStore_BAL.ModelViews.OrderDTOs;
 using MilkStore_BAL.ModelViews.PaymentDTOs;
@@ -36,6 +38,11 @@ namespace MilkStore_BAL.Mapper
             CreateMap<Payment, PaymentDtoResponse>().ReverseMap();
             CreateMap<ChatRequest, MessageDtoRequest>().ReverseMap();
             CreateMap<ChatRequest, MessageDtoResponse>().ReverseMap();
+            CreateMap<Feedback, FeedbackDtoRequest>().ReverseMap();
+            CreateMap<Feedback, FeedbackDtoResponse>().ReverseMap();
+            CreateMap<Feedback, UpdateFeedbackDtoRequest>().ReverseMap();
+            CreateMap<Blog, BlogDtoResponse>().ReverseMap();
+            CreateMap<BlogDtoRequest, Blog>();
         }
     }
 }
