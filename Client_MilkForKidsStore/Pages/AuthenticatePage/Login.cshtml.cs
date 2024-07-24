@@ -19,13 +19,11 @@ namespace Client_MilkForKidsStore.AuthenticatePage
         public UserAuthenticatingDtoRequest InfoView { get; set; }
 
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _config;
         private readonly ILogger<IndexModel> _logger;
 
         public LoginModel(HttpClient httpClient, IConfiguration config, ILogger<IndexModel> logger)
         {
             _httpClient = httpClient;
-            _config = config;
             _logger = logger;
         }
         public IActionResult OnGet()

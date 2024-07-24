@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\CustomerPage\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 
@@ -29,6 +30,10 @@
     <None Include="wwwroot\login-form-14\js\.DS_Store" />
     <None Include="wwwroot\login-form-14\scss\.DS_Store" />
     <None Include="wwwroot\login-form-14\scss\bootstrap\.DS_Store" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MilkStore_BAL\MilkStore_BAL.csproj" />
   </ItemGroup>
 
 </Project>

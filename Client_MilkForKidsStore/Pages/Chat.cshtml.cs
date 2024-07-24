@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Client_MilkForKidsStore.DTO.ChatDTOs;
 using Firebase.Database.Query;
+using MilkStore_BAL.ModelViews.ChatDTOs;
 
 namespace Client_MilkForKidsStore.Pages
 {

@@ -55,7 +55,7 @@ namespace MilkStore.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("/api/v1/accounts/register")]
+        [HttpPost("/register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterDtoRequest newAccount)
         {
             if (string.IsNullOrEmpty(newAccount.Email) || string.IsNullOrEmpty(newAccount.Password) || string.IsNullOrEmpty(newAccount.UserName))

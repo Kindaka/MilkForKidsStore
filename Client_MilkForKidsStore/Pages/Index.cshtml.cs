@@ -1,6 +1,6 @@
-﻿using Client_MilkForKidsStore.DTO.ProductDTOs;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MilkStore_BAL.ModelViews.ProductDTOs;
 using Newtonsoft.Json;
 
 namespace Client_MilkForKidsStore.Pages
