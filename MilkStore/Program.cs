@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
 
 // Connection string
 builder.Services.AddDbContext<MomAndKidsContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

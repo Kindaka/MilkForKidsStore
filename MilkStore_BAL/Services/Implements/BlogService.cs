@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Identity.Client;
 using MilkStore_BAL.ModelViews.BlogDTOs;
 using MilkStore_BAL.ModelViews.BlogProductDTOs;
-using MilkStore_BAL.ModelViews.FeedbackDTOs;
-using MilkStore_BAL.ModelViews.OrderDetailDTOs;
 using MilkStore_BAL.Services.Interfaces;
 using MilkStore_DAL.Entities;
 using MilkStore_DAL.UnitOfWorks.Interfaces;
