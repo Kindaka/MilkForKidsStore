@@ -100,12 +100,12 @@ namespace MilkStore_BAL.Services.Implements
         {
             try
             {
-                string role = "";
+                int role = 0;
                 if (account.RoleId == 3)
                 {
                     var customer = (await _unitOfWork.CustomerRepository.GetAsync(c => c.AccountId == account.AccountId)).FirstOrDefault();
                     if (customer != null) { 
-                        role = customer.CustomerId.ToString();
+                        role = customer.CustomerId;
                     }
                 }
 
@@ -114,7 +114,7 @@ namespace MilkStore_BAL.Services.Implements
                 var accessClaims = new List<Claim>
                 {
                     new Claim("AccountId", account.AccountId.ToString()),
-                    new Claim("CustomerId", role),
+                    new Claim("CustomerId", role.ToString()),
                     new Claim("RoleId", account.RoleId.ToString())
                 };
                 var accessExpiration = DateTime.Now.AddMinutes(30);

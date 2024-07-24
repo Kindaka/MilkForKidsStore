@@ -44,11 +44,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireAdminRole", policy => policy.RequireClaim("RoleId", "1"));
-    options.AddPolicy("RequireShopRole", policy => policy.RequireClaim("RoleId", "2"));
+    options.AddPolicy("RequireStaffRole", policy => policy.RequireClaim("RoleId", "2"));
     options.AddPolicy("RequireCustomerRole", policy => policy.RequireClaim("RoleId", "3"));
-    options.AddPolicy("RequireAdminOrShopRole", policy => policy.RequireClaim("RoleId", "1", "2"));
+    options.AddPolicy("RequireAdminOrStaffRole", policy => policy.RequireClaim("RoleId", "1", "2"));
     options.AddPolicy("RequireAdminOrCustomerRole", policy => policy.RequireClaim("RoleId", "1", "3"));
-    options.AddPolicy("RequireShopOrCustomerRole", policy => policy.RequireClaim("RoleId", "2", "3"));
+    options.AddPolicy("RequireStaffOrCustomerRole", policy => policy.RequireClaim("RoleId", "2", "3"));
     options.AddPolicy("RequireAllRoles", policy => policy.RequireClaim("RoleId", "1", "2", "3"));
 });
 

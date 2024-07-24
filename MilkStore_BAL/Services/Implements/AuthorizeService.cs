@@ -17,29 +17,59 @@ namespace MilkStore_BAL.Services.Implements
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<(bool isUser, bool isAdmin)> CheckAuthorizeByAccountId(int userAccountId, int accountId)
+        public async Task<(bool isMatchedCustomer, bool isAuthorizedAccount)> CheckAuthorizeByAccountId(int userAccountId, int accountId)
         {
             try
             {
-                bool isAdmin = false;
-                bool isUser = false;
+                bool isAuthorizedAccount = false;
+                bool isMatchedCustomer = false;
                 var account = (await _unitOfWork.AccountRepository.GetByIDAsync(userAccountId));
                 if (account != null)
                 {
                     if (account.AccountId == accountId)
                     {
-                        isUser = true;
+                        isMatchedCustomer = true;
                     }
                 }
                 var accountJwt = await _unitOfWork.AccountRepository.GetByIDAsync(accountId);
                 if (accountJwt != null)
                 {
-                    if (accountJwt.RoleId == 1)
+                    if (accountJwt.RoleId == 1 || accountJwt.RoleId == 2)
                     {
-                        isAdmin = true;
+                        isAuthorizedAccount = true;
                     }
                 }
-                return (isUser, isAdmin);
+                return (isMatchedCustomer, isAuthorizedAccount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(bool isMatchedCustomer, bool isAuthorizedAccount)> CheckAuthorizeByCustomerId(int customerId, int accountId)
+        {
+            try
+            {
+                bool isAuthorizedAccount = false;
+                bool isMatchedCustomer = false;
+                var account = (await _unitOfWork.CustomerRepository.GetByIDAsync(customerId));
+                if (account != null)
+                {
+                    if (account.AccountId == accountId)
+                    {
+                        isMatchedCustomer = true;
+                    }
+                }
+                var accountJwt = await _unitOfWork.AccountRepository.GetByIDAsync(accountId);
+                if (accountJwt != null)
+                {
+                    if (accountJwt.RoleId == 1 || accountJwt.RoleId == 2)
+                    {
+                        isAuthorizedAccount = true;
+                    }
+                }
+                return (isMatchedCustomer, isAuthorizedAccount);
             }
             catch (Exception ex)
             {

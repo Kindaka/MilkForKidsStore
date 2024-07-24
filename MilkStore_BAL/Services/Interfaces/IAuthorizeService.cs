@@ -8,6 +8,7 @@ namespace MilkStore_BAL.Services.Interfaces
 {
     public interface IAuthorizeService
     {
-        Task<(bool isUser, bool isAdmin)> CheckAuthorizeByAccountId(int userAccountId, int accountId);
+        Task<(bool isMatchedCustomer, bool isAuthorizedAccount)> CheckAuthorizeByAccountId(int userAccountId, int accountId);
+        Task<(bool isMatchedCustomer, bool isAuthorizedAccount)> CheckAuthorizeByCustomerId(int customerId, int accountId);
     }
 }
