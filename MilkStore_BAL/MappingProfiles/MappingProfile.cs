@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MilkStore_BAL.ModelViews.AccountDTOs;
 using MilkStore_BAL.ModelViews.CartDTOs;
+using MilkStore_BAL.ModelViews.ChatDTOs;
 using MilkStore_BAL.ModelViews.OrderDetailDTOs;
 using MilkStore_BAL.ModelViews.OrderDTOs;
 using MilkStore_BAL.ModelViews.PaymentDTOs;
@@ -33,6 +34,8 @@ namespace MilkStore_BAL.Mapper
             CreateMap<Order, OrderDtoResponse>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailDtoResponse>().ReverseMap();
             CreateMap<Payment, PaymentDtoResponse>().ReverseMap();
+            CreateMap<ChatRequest, MessageDtoRequest>().ReverseMap();
+            CreateMap<ChatRequest, MessageDtoResponse>().ReverseMap();
         }
     }
 }

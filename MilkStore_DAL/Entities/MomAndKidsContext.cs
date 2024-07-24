@@ -20,6 +20,7 @@ namespace MilkStore_DAL.Entities
         public virtual DbSet<Blog> Blogs { get; set; } = null!;
         public virtual DbSet<BlogProduct> BlogProducts { get; set; } = null!;
         public virtual DbSet<Cart> Carts { get; set; } = null!;
+        public virtual DbSet<ChatRequest> ChatRequests { get; set; } = null!;
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Feedback> Feedbacks { get; set; } = null!;
         public virtual DbSet<ImageProduct> ImageProducts { get; set; } = null!;
@@ -34,6 +35,8 @@ namespace MilkStore_DAL.Entities
         {
             if (!optionsBuilder.IsConfigured)
             {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseSqlServer("Server=(local);Database=MomAndKids;Uid=sa;Pwd=12345;TrustServerCertificate=True");
             }
         }
 
@@ -125,11 +128,25 @@ namespace MilkStore_DAL.Entities
                     .HasConstraintName("FK_productId_Cart");
             });
 
+            modelBuilder.Entity<ChatRequest>(entity =>
+            {
+                entity.HasKey(e => e.MessageId)
+                    .HasName("PK__ChatRequ__C87C0C9CDA8FBE43");
+
+                entity.ToTable("ChatRequest");
+
+                entity.Property(e => e.CustomerId).HasColumnName("customerId");
+
+                entity.Property(e => e.SendTime).HasColumnType("datetime");
+
+                entity.Property(e => e.Type).HasMaxLength(256);
+            });
+
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.ToTable("Customer");
 
-                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F657BE16D")
+                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F88DFCA20")
                     .IsUnique();
 
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
@@ -197,7 +214,7 @@ namespace MilkStore_DAL.Entities
             modelBuilder.Entity<ImageProduct>(entity =>
             {
                 entity.HasKey(e => e.ImageId)
-                    .HasName("PK__ImagePro__336E9B5588FD45C4");
+                    .HasName("PK__ImagePro__336E9B55898BBA22");
 
                 entity.ToTable("ImageProduct");
 
@@ -279,7 +296,7 @@ namespace MilkStore_DAL.Entities
             {
                 entity.ToTable("Payment");
 
-                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335C92942E78")
+                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335C28D0A6C2")
                     .IsUnique();
 
                 entity.Property(e => e.OrderId).HasColumnName("orderId");
@@ -344,7 +361,7 @@ namespace MilkStore_DAL.Entities
             modelBuilder.Entity<VoucherOfShop>(entity =>
             {
                 entity.HasKey(e => e.VoucherId)
-                    .HasName("PK__VoucherO__F53389E94E278163");
+                    .HasName("PK__VoucherO__F53389E97BD50612");
 
                 entity.ToTable("VoucherOfShop");
 
