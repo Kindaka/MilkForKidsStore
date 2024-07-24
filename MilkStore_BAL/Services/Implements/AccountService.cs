@@ -100,21 +100,23 @@ namespace MilkStore_BAL.Services.Implements
         {
             try
             {
-                // Retrieve the customer information based on AccountId
-                var customer = (await _unitOfWork.CustomerRepository.GetAsync(c => c.AccountId == account.AccountId)).FirstOrDefault();
-                if (customer == null)
+                string role = "";
+                if (account.RoleId == 3)
                 {
-                    throw new Exception("Customer not found.");
+                    var customer = (await _unitOfWork.CustomerRepository.GetAsync(c => c.AccountId == account.AccountId)).FirstOrDefault();
+                    if (customer != null) { 
+                        role = customer.CustomerId.ToString();
+                    }
                 }
 
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var accessClaims = new List<Claim>
-        {
-            new Claim("AccountId", account.AccountId.ToString()),
-            new Claim("CustomerId", customer.CustomerId.ToString()), // Include CustomerId in claims for Chat
-            new Claim("RoleId", account.RoleId.ToString())
-        };
+                {
+                    new Claim("AccountId", account.AccountId.ToString()),
+                    new Claim("CustomerId", role),
+                    new Claim("RoleId", account.RoleId.ToString())
+                };
                 var accessExpiration = DateTime.Now.AddMinutes(30);
                 var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);
                 var accessToken = new JwtSecurityTokenHandler().WriteToken(accessJwt);
