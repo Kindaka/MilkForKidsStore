@@ -81,21 +81,20 @@ namespace MilkStore_BAL.Services.Implements
             try
             {
                 var customer = await _unitOfWork.CustomerRepository.GetByIDAsync(customerId);
-                if (customer != null)
+                string customerName = customer?.UserName ?? "Customer";
+
+                List<MessageDtoResponse> response = new List<MessageDtoResponse>();
+                var chatHistory = await _unitOfWork.ChatRequestRepository.GetAsync(filter: c => c.CustomerId == customerId, orderBy: c => c.OrderBy(s => s.SendTime));
+                if (chatHistory.Any())
                 {
-                    List<MessageDtoResponse> response = new List<MessageDtoResponse>();
-                    var chatHistory = await _unitOfWork.ChatRequestRepository.GetAsync(filter: c => c.CustomerId == customerId, orderBy: c => c.OrderBy(s => s.SendTime));
-                    if (chatHistory.Any())
+                    foreach (var chat in chatHistory)
                     {
-                        foreach (var chat in chatHistory)
-                        {
-                            var message = _mapper.Map<MessageDtoResponse>(chat);
-                            response.Add(message);
-                        }
+                        var message = _mapper.Map<MessageDtoResponse>(chat);
+                        message.CustomerName = chat.Type == "CUSTOMER" ? customerName : "Staff";
+                        response.Add(message);
                     }
-                    return (response, customer.UserName);
                 }
-                return (null, null);
+                return (response, customerName);
             }
             catch (Exception ex)
             {
@@ -103,6 +102,7 @@ namespace MilkStore_BAL.Services.Implements
                 throw new Exception(ex.Message);
             }
         }
+
 
         public async Task SendMessage(MessageDtoRequest request)
         {

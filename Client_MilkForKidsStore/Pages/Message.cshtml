@@ -1,0 +1,58 @@
+﻿@page
+@model Client_MilkForKidsStore.Pages.MessageModel
+@{
+    ViewData["Title"] = "Chat";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Chat</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Message"]
+        </div>
+    }
+
+    <div id="chatBox" class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Chat History</h3>
+        </div>
+        <div class="card-body" id="chatHistory" style="max-height: 400px; overflow-y: auto;">
+            @if (Model.MessageHistory != null && Model.MessageHistory.Count > 0)
+            {
+                @foreach (var message in Model.MessageHistory)
+                {
+                    <div class="mb-3">
+                        <strong class="text-primary">@message.CustomerName</strong>
+                        <p class="mb-1">@message.Content</p>
+                        <small class="text-muted">@message.SendTime</small>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">No chat history found.</p>
+            }
+        </div>
+    </div>
+
+    <div id="sendMessage" class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Send Message</h3>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="input-group">
+                    <input type="text" asp-for="Content" placeholder="Type your message here" class="form-control" />
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

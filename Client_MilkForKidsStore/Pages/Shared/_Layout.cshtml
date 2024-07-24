@@ -75,7 +75,7 @@
             <div class="navbar-nav ms-auto py-0">
                 <a href="index.html" class="nav-item nav-link active">Home</a>
                 <a href="product.html" class="nav-item nav-link">Product</a>
-                <a href="chat" class="nav-item nav-link">Contact</a>
+                <a href="/Message" class="nav-item nav-link">Contact</a>
                 <a href="product.html" class="nav-item nav-link">Blog</a>
                 @if (isAuthenticated)
                 {
@@ -83,27 +83,18 @@
                     <form id="logoutForm" method="post" asp-page="/AuthenticatePage/Login" asp-page-handler="Logout" style="display: inline;">
                         <a href="#" class="nav-item nav-link nav-contact bg-primary text-white px-5 ms-lg-5" onclick="document.getElementById('logoutForm').submit(); return false;">Logout <i class="bi bi-arrow-right"></i></a>
                     </form>
-                    
+
                 }
                 else
                 {
                     <a class="nav-item nav-link nav-contact bg-primary text-white px-5 ms-lg-5" asp-area="" asp-page="/AuthenticatePage/Login">Sign In <i class="bi bi-arrow-right"></i></a>
                 }
-                
+
             </div>
         </div>
     </nav>
     <!-- Navbar End -->
-    
-    
-   
     @RenderBody()
-
-    
-    
-    
-
-
 
     <!-- Footer Start -->
     <div class="container-fluid bg-light mt-5 py-5">
@@ -186,7 +177,6 @@
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary py-3 fs-4 back-to-top"><i class="bi bi-arrow-up"></i></a>
 
-
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -196,5 +186,7 @@
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
+
+    @RenderSection("Scripts", required: false) <!-- Add this line to render the Scripts section -->
 </body>
 </html>
