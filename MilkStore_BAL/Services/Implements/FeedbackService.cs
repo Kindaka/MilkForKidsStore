@@ -25,7 +25,7 @@ namespace MilkStore_BAL.Services.Implements
         public async Task<FeedbackDtoResponse> CreateFeedback(FeedbackDtoRequest request)
         {
             var verifyAccountId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("AccountId")?.Value);
-            var accountExist = _unitOfWork.CustomerRepository.GetAsync(x => x.AccountId == verifyAccountId);
+            var accountExist = await _unitOfWork.CustomerRepository.SingleOrDefaultAsync(x => x.AccountId == verifyAccountId);
             var shopExist = _unitOfWork.ProductRepository.FindAsync(x => x.ProductId == request.ProductId);
 
             if(accountExist == null || shopExist == null)
@@ -34,7 +34,7 @@ namespace MilkStore_BAL.Services.Implements
             }
 
             var map = _mapper.Map<Feedback>(request);
-            map.CustomerId = verifyAccountId;
+            map.CustomerId = accountExist.CustomerId;
             map.Status = true;
             await _unitOfWork.FeedbackRepository.AddAsync(map);
             await Task.Delay(500);
