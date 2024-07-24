@@ -31,15 +31,6 @@ namespace MilkStore_DAL.Entities
         public virtual DbSet<ProductCategory> ProductCategories { get; set; } = null!;
         public virtual DbSet<VoucherOfShop> VoucherOfShops { get; set; } = null!;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=(local);Database=MomAndKids;Uid=sa;Pwd=12345;TrustServerCertificate=True");
-            }
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Account>(entity =>
@@ -131,7 +122,7 @@ namespace MilkStore_DAL.Entities
             modelBuilder.Entity<ChatRequest>(entity =>
             {
                 entity.HasKey(e => e.MessageId)
-                    .HasName("PK__ChatRequ__C87C0C9CDA8FBE43");
+                    .HasName("PK__ChatRequ__C87C0C9C9EF1319E");
 
                 entity.ToTable("ChatRequest");
 
@@ -146,7 +137,7 @@ namespace MilkStore_DAL.Entities
             {
                 entity.ToTable("Customer");
 
-                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F88DFCA20")
+                entity.HasIndex(e => e.AccountId, "UQ__Customer__F267251F7F735FA2")
                     .IsUnique();
 
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
@@ -178,19 +169,15 @@ namespace MilkStore_DAL.Entities
 
             modelBuilder.Entity<Feedback>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("Feedback");
+
+                entity.Property(e => e.FeedbackId).HasColumnName("feedbackId");
 
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
 
                 entity.Property(e => e.FeedbackContent)
                     .HasMaxLength(250)
                     .HasColumnName("feedbackContent");
-
-                entity.Property(e => e.FeedbackId)
-                    .ValueGeneratedOnAdd()
-                    .HasColumnName("feedbackId");
 
                 entity.Property(e => e.ProductId).HasColumnName("productId");
 
@@ -199,13 +186,13 @@ namespace MilkStore_DAL.Entities
                 entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Customer)
-                    .WithMany()
+                    .WithMany(p => p.Feedbacks)
                     .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_customerId_Feedback");
 
                 entity.HasOne(d => d.Product)
-                    .WithMany()
+                    .WithMany(p => p.Feedbacks)
                     .HasForeignKey(d => d.ProductId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_productId_Feedback");
@@ -214,7 +201,7 @@ namespace MilkStore_DAL.Entities
             modelBuilder.Entity<ImageProduct>(entity =>
             {
                 entity.HasKey(e => e.ImageId)
-                    .HasName("PK__ImagePro__336E9B55898BBA22");
+                    .HasName("PK__ImagePro__336E9B55D8542F91");
 
                 entity.ToTable("ImageProduct");
 
@@ -296,7 +283,7 @@ namespace MilkStore_DAL.Entities
             {
                 entity.ToTable("Payment");
 
-                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335C28D0A6C2")
+                entity.HasIndex(e => e.OrderId, "UQ__Payment__0809335C1B42C645")
                     .IsUnique();
 
                 entity.Property(e => e.OrderId).HasColumnName("orderId");
@@ -361,7 +348,7 @@ namespace MilkStore_DAL.Entities
             modelBuilder.Entity<VoucherOfShop>(entity =>
             {
                 entity.HasKey(e => e.VoucherId)
-                    .HasName("PK__VoucherO__F53389E97BD50612");
+                    .HasName("PK__VoucherO__F53389E9E5CF8DB7");
 
                 entity.ToTable("VoucherOfShop");
 

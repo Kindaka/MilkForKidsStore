@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hangfire.Server;
 using MilkStore_BAL.ModelViews.PaymentDTOs;
 using MilkStore_BAL.Services.Interfaces;
 using MilkStore_DAL.Entities;
@@ -56,8 +57,17 @@ namespace MilkStore_BAL.Services.Implements
                         existedOrder.Status = 2;
                         await _unitOfWork.OrderRepository.UpdateAsync(existedOrder);
 
+                        // return back quantity to product
+                        var orderDetails = await _unitOfWork.OrderDetailRepository.GetAllAsync(o => o.OrderId == existedOrder.OrderId);
+                        foreach (var od in orderDetails)
+                        {
+                            var product = await _unitOfWork.ProductRepository.GetByIDAsync(od.ProductId);
+                            product.ProductQuantity += od.OrderQuantity;
+                            await _unitOfWork.ProductRepository.UpdateAsync(product);
+                        }
+
                         // return points customer point if used
-                        if(existedOrder.ExchangedPoint > 0)
+                        if (existedOrder.ExchangedPoint > 0)
                         {
                             var customer = await _unitOfWork.CustomerRepository.GetByIDAsync(existedOrder.CustomerId);
                             customer.Point += existedOrder.ExchangedPoint;

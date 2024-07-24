@@ -51,6 +51,18 @@ CREATE TABLE [dbo].[Product](
 )
 GO
 
+-- Create trigger to update status based on quantity
+CREATE TRIGGER trg_UpdateProductStatus
+ON [dbo].[Product]
+AFTER UPDATE
+AS
+BEGIN
+    UPDATE [dbo].[Product]
+    SET [productStatus] = 0
+    WHERE [productQuantity] = 0 AND [productId] IN (SELECT [productId] FROM inserted);
+END;
+GO
+
 CREATE TABLE [dbo].[ImageProduct](
 	[imageId] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,
 	[productId] [int] NOT NULL,
@@ -125,7 +137,7 @@ CREATE TABLE [dbo].[OrderDetail](
 GO
 
 CREATE TABLE [dbo].[Payment] (
-	PaymentId INT IDENTITY(1,1) PRIMARY KEY,
+	PaymentId INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	orderId INT UNIQUE NOT NULL,
 	PaymentMethod NVARCHAR(100),
 	BankCode NVARCHAR(MAX),
@@ -141,7 +153,7 @@ CREATE TABLE [dbo].[Payment] (
 GO
 
 CREATE TABLE [dbo].[Feedback](
-	[feedbackId] [int] IDENTITY NOT NULL,
+	[feedbackId] [int] PRIMARY KEY IDENTITY(1,1) NOT NULL,
 	[customerId] [int] NOT NULL,
 	[productId] [int] NOT NULL,
 	[feedbackContent] [nvarchar](250) NOT NULL,
@@ -153,7 +165,7 @@ CREATE TABLE [dbo].[Feedback](
 GO
 
 create table ChatRequest (
-	MessageId INT IDENTITY(1,1) PRIMARY KEY,
+	MessageId INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	[customerId] INT NOT NULL,
 	Type NVARCHAR(256) NOT NULL,
 	Content NVARCHAR(MAX),

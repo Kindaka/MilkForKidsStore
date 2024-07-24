@@ -11,12 +11,15 @@ using MilkStore_DAL.UnitOfWorks.Interfaces;
 using System.Text;
 using Google.Apis.Auth.OAuth2;
 using FirebaseAdmin;
+using MilkStore_BAL.BackgroundServices.Interfaces;
+using MilkStore_BAL.BackgroundServices.Implements;
+using Hangfire;
+using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddHttpContextAccessor();
 
 // Connection string
 builder.Services.AddDbContext<MomAndKidsContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -70,16 +73,37 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
-
 builder.Services.AddScoped<IAdminService, AdminService>();
 
+// Background service containers
+builder.Services.AddScoped<IOrderBackgroundService, OrderBackgroundService>();
+builder.Services.AddScoped<IProductBackgroundService, ProductBackgroundService>();
+
 builder.Services.AddCors();
+
+builder.Services.AddHttpContextAccessor();
 
 // Configure Firebase
 FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
 });
+
+// Add Hangfire services.
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.Zero,
+        UseRecommendedIsolationLevel = true,
+        UsePageLocksOnDequeue = true,
+        DisableGlobalLocks = true
+    }));
+builder.Services.AddHangfireServer();
 
 // Configure Swagger
 builder.Services.AddSwaggerGen(opt =>
@@ -119,6 +143,23 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHangfireDashboard();
+
+// Schedule the recurring job (Hangfire)
+var recurringJobManager = app.Services.GetRequiredService<IRecurringJobManager>();
+
+recurringJobManager.AddOrUpdate(
+    "RejectExpiredOrder",
+    () => app.Services.CreateScope().ServiceProvider.GetRequiredService<IOrderBackgroundService>().RejectExpiredOrder(),
+    Cron.MinuteInterval(2)
+    );
+
+recurringJobManager.AddOrUpdate(
+    "RemoveHiddenProductInCustomerCarts",
+    () => app.Services.CreateScope().ServiceProvider.GetRequiredService<IProductBackgroundService>().RemoveHiddenProductInCustomerCarts(),
+    Cron.Minutely
+    );
 
 app.UseCors();
 
