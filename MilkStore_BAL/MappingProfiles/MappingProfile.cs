@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MilkStore_BAL.ModelViews.CustomerDTOs;
 
 namespace MilkStore_BAL.Mapper
 {
@@ -41,6 +42,8 @@ namespace MilkStore_BAL.Mapper
             CreateMap<Feedback, FeedbackDtoRequest>().ReverseMap();
             CreateMap<Feedback, FeedbackDtoResponse>().ReverseMap();
             CreateMap<Feedback, UpdateFeedbackDtoRequest>().ReverseMap();
+            CreateMap<Customer, CustomerDto>().ReverseMap();
+            CreateMap<Customer, UpdateCustomerDto>().ReverseMap();
             CreateMap<Blog, BlogDtoResponse>().ReverseMap();
                        //.ForMember(dest => dest.BlogProductId, opt => opt.MapFrom(src => src.BlogProducts.Select(bp => bp.ProductId)))
                        //.ForMember(dest => dest.BlogProducts, opt => opt.MapFrom(src => src.BlogProducts.Select(bp => new ProductDtoResponse
