@@ -74,6 +74,46 @@
 
             </form>
         </div>
+
+        <!-- Comment List Start -->
+        <div class="mb-5">
+            <h3 class="text-uppercase border-start border-5 border-primary ps-3 mb-4">Comments</h3>
+            @if (Model.Feedback.Any())
+            {
+                @foreach (var item in Model.Feedback)
+                {
+                    <div class="d-flex mb-4">
+                        <img src="~/img/user.jpg" class="img-fluid" style="width: 45px; height: 45px;">
+                        <div class="ps-3">
+                            <h6><a href="">@item.Customer.UserName</a><small><i></i></small></h6>
+                            <p>
+                                @item.FeedbackContent
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No feedback available.</p>
+            }
+        </div>
+        <!-- Comment List End -->
+        <!-- Comment Form Start -->
+        <div class="p-5">
+            <h3 class="text-uppercase border-start border-5 border-primary ps-3 mb-4">Add Feedback</h3>
+            <form method="post" asp-page-handler="PostFeedback" asp-route-id="@Model.Product?.ProductId">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <textarea class="form-control" id="FeedbackContent" name="FeedbackContent" rows="5" placeholder="Comment" required></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100 py-3" type="submit">Add Feedback</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- Comment Form End -->
     </div>
 </div>
 

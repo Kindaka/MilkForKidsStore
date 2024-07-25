@@ -9,14 +9,15 @@
             <h6 class="text-primary text-uppercase">Blog</h6>
             <h1 class="display-5 text-uppercase mb-0">Article from our blog post</h1>
         </div>
-        <div class="row g-5">
+             
+        <div class="row g-12">
+            @foreach (var item in Model.Blogs)
+            {
             <div class="col-lg-6">
                 <div class="blog-item">
-                     @foreach (var item in Model.Blogs)
-            {
                     <div class="row g-0 bg-light overflow-hidden">
                         <div class="col-12 col-sm-5 h-100">
-                                @if (item.BlogImage != null && item.BlogImage.Any())
+                                @if (item.BlogImage != null)
                                 {
                                     <img class="img-fluid h-100" src="@item.BlogImage" style="object-fit: cover;">
                                 }
@@ -36,9 +37,10 @@
                             </div>
                         </div>
                     </div>
-                    }
+                    
                 </div>
             </div>
+            }
         </div>
     </div>
 </div>

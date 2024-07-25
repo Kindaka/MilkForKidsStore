@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MilkStore_BAL.ModelViews.CustomerDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +14,11 @@ namespace MilkStore_BAL.ModelViews.FeedbackDTOs
         public int ProductId { get; set; }
         public string FeedbackContent { get; set; } = null!;
         public double RateNumber { get; set; }
-        public double AverageNumber { get; set; }
+        public double? AverageNumber { get; set; }
 
         public bool Status { get; set; }
+        public CustomerDto Customer { get; set; } = null!;
+
 
     }
 }

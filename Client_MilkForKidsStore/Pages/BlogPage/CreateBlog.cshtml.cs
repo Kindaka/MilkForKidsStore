@@ -36,19 +36,33 @@ namespace Client_MilkForKidsStore.Pages.BlogPage
 
         }
 
-        public async Task<IActionResult> OnPostAsync([FromForm] BlogDtoRequest blogRequest, [FromForm] List<int> productIds)
+        public async Task<IActionResult> OnPostAsync([FromForm] BlogDetailDtoRequest blogRequest, [FromForm] List<int> productIds)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
+            string imagePath = null;
+            if (blogRequest.BlogImage != null)
+            {
+                var fileName = Path.GetFileNameWithoutExtension(blogRequest.BlogImage.FileName);
+                var extension = Path.GetExtension(blogRequest.BlogImage.FileName);
+                fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await blogRequest.BlogImage.CopyToAsync(stream);
+                }
+                imagePath = $"/images/{fileName}";
+            }
+
             var blogProductDto = new BlogProductDto
             {
                 BlogTitle = blogRequest.BlogTitle,
                 BlogContent = blogRequest.BlogContent,
-                BlogImage = blogRequest.BlogImage,
-                Status = true, // Set status as needed
+                BlogImage = imagePath,
+                Status = true,
                 productId = productIds
             };
 
@@ -74,6 +88,5 @@ namespace Client_MilkForKidsStore.Pages.BlogPage
 
             return RedirectToPage("/BlogPage/BlogIndex");
         }
-
     }
 }

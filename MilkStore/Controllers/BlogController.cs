@@ -22,7 +22,6 @@ namespace MilkStore.Controllers
             _service = service;
         }
 
-        [Authorize(Policy = "RequireStaffRole")]
         [HttpGet("GetAllBlogByBlogId/{blogId}")]
         public async Task<IActionResult> GetAllBlogByBlogId(int blogId)
         {

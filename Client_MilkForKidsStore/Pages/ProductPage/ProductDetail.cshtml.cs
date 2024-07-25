@@ -2,6 +2,7 @@ using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MilkStore_BAL.ModelViews.CartDTOs;
+using MilkStore_BAL.ModelViews.FeedbackDTOs;
 using MilkStore_BAL.ModelViews.ProductDTOs;
 using MilkStore_DAL.Entities;
 using Newtonsoft.Json;
@@ -15,6 +16,8 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
         private readonly HttpClient _httpClient;
         public ProductDtoResponse? Product;
         public int Quantity;
+        public IList<FeedbackDtoResponse> Feedback { get; set; } = new List<FeedbackDtoResponse>();
+
 
         public ProductDetailModel(HttpClient httpClient)
         {
@@ -24,6 +27,7 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
         public async Task<IActionResult> OnGetAsync(int id)
         {
             var response = await _httpClient.GetAsync($"https://localhost:7223/api/v1/Product/get-product-by-id/{id}");
+            var responseFeedback = await _httpClient.GetAsync($"https://localhost:7223/api/Feedback/GetAllFeedback/{id}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -35,6 +39,33 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
                 Product = new ProductDtoResponse();
                 TempData["Message"] = "Not found product.";
                 return Page();
+            }
+            if (responseFeedback.IsSuccessStatusCode)
+            {
+                var jsonResponseFb = await responseFeedback.Content.ReadAsStringAsync();
+
+                if (jsonResponseFb.Contains("Feedback is empty"))
+                {
+                    Feedback = new List<FeedbackDtoResponse>();
+                    TempData["Message"] = "No feedback available.";
+                }
+                else
+                {
+                    try
+                    {
+                        Feedback = JsonConvert.DeserializeObject<List<FeedbackDtoResponse>>(jsonResponseFb) ?? new List<FeedbackDtoResponse>();
+                    }
+                    catch (JsonSerializationException ex)
+                    {
+                        Feedback = new List<FeedbackDtoResponse>();
+                        TempData["Message"] = "Error parsing feedback data: " + ex.Message;
+                    }
+                }
+            }
+            else
+            {
+                Feedback = new List<FeedbackDtoResponse>();
+                TempData["Message"] = "Feedback not found.";
             }
             return Page();
         }
@@ -67,14 +98,68 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
                 return RedirectToPage("/Error", new { errorMessage = ex.Message });
             }
         }
+        public async Task<IActionResult> OnPostPostFeedbackAsync(int id, string feedbackContent)
+        {
+            feedbackContent = Request.Form["FeedbackContent"];
+
+            if (string.IsNullOrWhiteSpace(feedbackContent))
+            {
+                TempData["ErrorMessage"] = "Feedback content cannot be empty.";
+                return RedirectToPage("/ProductPage/ProductDetail", new { id = id });
+            }
+
+            try
+            {
+                var customerId = GetCustomerId();
+
+                var feedbackDtoRequest = new FeedbackDtoRequest
+                {
+                    ProductId = id,
+                    CustomerId = customerId,
+                    FeedbackContent = feedbackContent,
+                    RateNumber = 5
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("https://localhost:7223/api/Feedback/CreateFeedback", feedbackDtoRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    if (response != null)
+                    {
+                        TempData["SuccessMessage"] = "Feedback added successfully.";
+                        return RedirectToPage("/ProductPage/ProductDetail", new { id = id });
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "You must purchase to receive feedback.";
+                        return RedirectToPage("/ProductPage/ProductDetail", new { id = id });
+                    }
+
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Failed to add feedback.";
+                    return RedirectToPage("/ProductPage/ProductDetail", new { id = id });
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Something wrong!!!";
+                return RedirectToPage("/ProductPage/ProductDetail", new { id = id });
+
+            }
+        }
 
         public int GetCustomerId()
         {
             var accessToken = Request.Cookies["jsonToken"];
-            if(string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
                 RedirectToPage("/Login");
-            } else
+            }
+            else
             {
                 var handler = new JwtSecurityTokenHandler();
                 var jsonToken = handler.ReadToken(accessToken) as JwtSecurityToken;

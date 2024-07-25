@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Identity.Client;
 using MilkStore_BAL.ModelViews.FeedbackDTOs;
 using MilkStore_BAL.Services.Interfaces;
 using MilkStore_DAL.Entities;
@@ -22,25 +23,22 @@ namespace MilkStore_BAL.Services.Implements
 
         }
 
-        public async Task<FeedbackDtoResponse> CreateFeedback(FeedbackDtoRequest request)
+        public async Task<FeedbackDtoRequest> CreateFeedback(FeedbackDtoRequest request)
         {
-            var verifyAccountId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("AccountId")?.Value);
-            var accountExist = await _unitOfWork.CustomerRepository.SingleOrDefaultAsync(x => x.AccountId == verifyAccountId);
             var shopExist = _unitOfWork.ProductRepository.FindAsync(x => x.ProductId == request.ProductId);
-
-            if(accountExist == null || shopExist == null)
+            var orderExist = _unitOfWork.OrderDetailRepository.GetAsync(x => x.ProductId == request.ProductId && x.Order.CustomerId == request.CustomerId).Result;
+            if( shopExist == null || orderExist.Count() == 0)
             {
                 return null;
             }
-
             var map = _mapper.Map<Feedback>(request);
-            map.CustomerId = accountExist.CustomerId;
             map.Status = true;
+            map.RateNumber = 0;
             await _unitOfWork.FeedbackRepository.AddAsync(map);
             await Task.Delay(500);
             await _unitOfWork.SaveAsync();
 
-            var response = _mapper.Map<FeedbackDtoResponse>(map);
+            var response = _mapper.Map<FeedbackDtoRequest>(map);
 
             return response;
         }
@@ -73,10 +71,10 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<IList<FeedbackDtoResponse>> GetAllFeedbackOfProduct(int productId)
         {
-            var getAllFbOShop = await _unitOfWork.FeedbackRepository
+            var getAllFbOShop = (await _unitOfWork.FeedbackRepository
                                             .GetAsync(filter: x => x.ProductId == productId
-                                                                && x.Status != true, 
-                                                                includeProperties: "Product,Customer");
+                                                                && x.Status == true, 
+                                                                includeProperties: "Product,Customer")).ToList();
 
             var response = _mapper.Map<IList<FeedbackDtoResponse>>(getAllFbOShop);
 
@@ -85,28 +83,33 @@ namespace MilkStore_BAL.Services.Implements
 
         public async Task<FeedbackDtoResponse> GetRatingProduct(int productId)
         {
+            var verifyAccountId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("AccountId")?.Value);
+            var accountExist =await _unitOfWork.CustomerRepository.SingleOrDefaultAsync(x => x.AccountId == verifyAccountId);
             var totalRateOfShop = await _unitOfWork.FeedbackRepository
                                                 .GetAsync(filter: x => x.ProductId == productId
                                                                     && x.Status == true);
-
-            var verifyAccountId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("AccountId")?.Value);
-            Customer accountExist = (Customer)await _unitOfWork.CustomerRepository.FindAsync(x => x.AccountId == verifyAccountId);
-
             var getRateUrSelf = await _unitOfWork.FeedbackRepository
                                                 .GetAsync(filter: x => x.ProductId == productId
-                                                                    && x.CustomerId == accountExist.CustomerId
+                                                && x.CustomerId == accountExist.CustomerId
                                                                     && x.Status == true,
-                                                          includeProperties: "Customer,Product");
+                                                          includeProperties: "Product");
 
             var getFirst = getRateUrSelf.FirstOrDefault();
 
-            var averageNum = totalRateOfShop.Any() ? totalRateOfShop.Average(x => x.RateNumber) : 0;
+            var averageNum = totalRateOfShop.Any() ? totalRateOfShop.Average(x => x.RateNumber) : (double?)null;
 
-            var reponse = _mapper.Map<FeedbackDtoResponse>(getFirst);
-            reponse.RateNumber = getFirst != null ? getFirst.RateNumber : 0;
-            reponse.AverageNumber = averageNum;
+            var response = _mapper.Map<FeedbackDtoResponse>(getFirst);
+            if (getFirst != null)
+            {
+                response.RateNumber = getFirst.RateNumber;
+            }
+            else
+            {
+                response.RateNumber = 0;
+            }
+            response.AverageNumber = averageNum;
 
-            return reponse;
+            return response;
         }
 
 
@@ -125,7 +128,7 @@ namespace MilkStore_BAL.Services.Implements
         public async Task<FeedbackDtoResponse> UpdateFeedback(int feedbackId, FeedbackDtoRequest request)
         {
             var verifyAccountId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirst("AccountId")?.Value);
-            Customer accountExist = (Customer)await _unitOfWork.CustomerRepository.FindAsync(x => x.AccountId == verifyAccountId);
+            var accountExist =await _unitOfWork.CustomerRepository.SingleOrDefaultAsync(x => x.AccountId == verifyAccountId);
 
             if (verifyAccountId != request.CustomerId)
             {
