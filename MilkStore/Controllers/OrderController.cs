@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MilkStore_BAL.ModelViews.OrderDTOs;
 using MilkStore_BAL.Services.Interfaces;
@@ -11,14 +13,17 @@ namespace MilkStore.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly IAuthorizeService _authorizeService;
         private readonly string _imagesDirectory;
 
-        public OrderController(IOrderService orderService, IWebHostEnvironment env)
+        public OrderController(IOrderService orderService, IWebHostEnvironment env, IAuthorizeService authorizeService)
         {
             _orderService = orderService;
             _imagesDirectory = Path.Combine(env.ContentRootPath, "img", "product");
+            _authorizeService = authorizeService;
         }
 
+        [Authorize("RequireStaffRole")]
         [HttpGet]
         public async Task<IActionResult> Get() {
             try
@@ -31,11 +36,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize("RequireStaffOrCustomerRole")]
         [HttpGet("detail/{orderId}")]
         public async Task<IActionResult> Get(int orderId)
         {
             try
             {
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByOrderId(orderId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer && !checkMatchedId.isAuthorizedAccount)
+                {
+                    return Forbid();
+                }
                 var response = await _orderService.Get(orderId);
                 if (response != null)
                 {
@@ -63,12 +79,23 @@ namespace MilkStore.Controllers
             }
         }
 
-        [HttpGet("{customerId}")]
-        public async Task<IActionResult> GetByCustomerId(int customerId)
+        [Authorize("RequireStaffOrCustomerRole")]
+        [HttpGet("customerId={customerId}&status={status}")]
+        public async Task<IActionResult> GetByCustomerId(int customerId, int status)
         {
             try
             {
-                var response = await _orderService.GetByCustomerId(customerId);
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCustomerId(customerId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer && !checkMatchedId.isAuthorizedAccount)
+                {
+                    return Forbid();
+                }
+                var response = await _orderService.GetByCustomerId(customerId, status);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -77,11 +104,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize("RequireCustomerRole")]
         [HttpPost("createOrder")]
         public async Task<IActionResult> CreateOrder(List<OrderProductDto> cartItems, int? voucherId, int exchangedPoint)
         {
             try
             {
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCustomerId(cartItems[0].customerId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer)
+                {
+                    return Forbid();
+                }
                 if (!cartItems.Any())
                 {
                     return BadRequest("No item to order");

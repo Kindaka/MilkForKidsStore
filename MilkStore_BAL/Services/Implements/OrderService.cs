@@ -221,21 +221,36 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
-        public async Task<List<OrderDtoResponse>> GetByCustomerId(int customerId)
+        public async Task<List<OrderDtoResponse>> GetByCustomerId(int customerId, int status)
         {
             try
             {
                 var response = new List<OrderDtoResponse>();
-                var orders = await _unitOfWork.OrderRepository.GetAsync(o => o.CustomerId == customerId);
-                if (orders.Any())
+                if(status == -1)
                 {
-                    foreach (var order in orders)
+                    var orders = await _unitOfWork.OrderRepository.GetAsync(o => o.CustomerId == customerId);
+                    if (orders.Any())
                     {
-                        var orderView = _mapper.Map<OrderDtoResponse>(order);
-                        response.Add(orderView);
+                        foreach (var order in orders)
+                        {
+                            var orderView = _mapper.Map<OrderDtoResponse>(order);
+                            response.Add(orderView);
+                        }
                     }
+                    return response;
+                } else
+                {
+                    var orders = await _unitOfWork.OrderRepository.GetAsync(o => o.CustomerId == customerId && o.Status == status);
+                    if (orders.Any())
+                    {
+                        foreach (var order in orders)
+                        {
+                            var orderView = _mapper.Map<OrderDtoResponse>(order);
+                            response.Add(orderView);
+                        }
+                    }
+                    return response;
                 }
-                return response;
             }
             catch (Exception ex)
             {

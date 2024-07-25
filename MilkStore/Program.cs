@@ -73,6 +73,7 @@ builder.Services.AddMemoryCache();
 // Service containers
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
 builder.Services.AddScoped<IProductCategoryService, ProductCategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);

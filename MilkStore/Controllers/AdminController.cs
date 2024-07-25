@@ -21,7 +21,7 @@ namespace MilkStore.Controllers
             _accountService = accountService;
         }
 
-        [AllowAnonymous]
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("/api/v1/accounts/staff")]
         public async Task<IActionResult> CreateAccountStaff([FromBody] UserRegisterDtoRequest request)
         {
@@ -52,6 +52,7 @@ namespace MilkStore.Controllers
 
         }
 
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("/api/v1/lock-account")]
         public async Task<IActionResult> LockAccount(int accountId)
         {
@@ -65,6 +66,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("/api/v1/unlock-account")]
         public async Task<IActionResult> UnlockAccount(int accountId)
         {

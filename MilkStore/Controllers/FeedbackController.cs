@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MilkStore_BAL.ModelViews.FeedbackDTOs;
+using MilkStore_BAL.Services.Implements;
 using MilkStore_BAL.Services.Interfaces;
 
 namespace MilkStore.Controllers
@@ -11,12 +13,15 @@ namespace MilkStore.Controllers
     public class FeedbackController : ControllerBase
     {
         private readonly IFeedbackService _service;
+        private readonly IAuthorizeService _authorizeService;
 
-        public FeedbackController(IFeedbackService service)
+        public FeedbackController(IFeedbackService service, IAuthorizeService authorizeService)
         {
             _service = service;
+            _authorizeService = authorizeService;
         }
 
+        [AllowAnonymous]
         [HttpGet("GetAllFeedback/{productId}")]
         public async Task<IActionResult> GetAllFeedbackOfProduct(int productId)
         {
@@ -36,6 +41,8 @@ namespace MilkStore.Controllers
             }
 
         }
+
+        [AllowAnonymous]
         [HttpGet("GetRate/{productId}")]
         public async Task<IActionResult> GetRatingShop(int productId)
         {
@@ -54,6 +61,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("GetOneFeedback/{productId}/{accountId}")]
         public async Task<IActionResult> GetOneFb(int productId, int accountId)
         {
@@ -73,11 +81,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpPost("CreateFeedback")]
         public async Task<IActionResult> CreateFeedback([FromBody] FeedbackDtoRequest request)
         {
             try
             {
+                var customerId = User.FindFirst("CustomerId")?.Value;
+                if (customerId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCartId(request.CustomerId, int.Parse(customerId));
+                if (!checkMatchedId)
+                {
+                    return Forbid();
+                }
                 var response = await _service.CreateFeedback(request);
                 return Ok(response);
             }
@@ -87,11 +106,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpPut("UpdateFeedback/{feedbackId}")]
         public async Task<IActionResult> UpdateFeedback(int feedbackId, [FromBody] FeedbackDtoRequest request)
         {
             try
             {
+                var customerId = User.FindFirst("CustomerId")?.Value;
+                if (customerId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCartId(feedbackId, int.Parse(customerId));
+                if (!checkMatchedId)
+                {
+                    return Forbid();
+                }
                 var response = await _service.UpdateFeedback(feedbackId, request);
                 return Ok(response);
             }
@@ -101,6 +131,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPut("UpdateStsAdmin/{feedbackId}")]
         public async Task<IActionResult> UpdateStsAdmin(int feedbackId, [FromBody] UpdateFeedbackDtoRequest request)
         {
@@ -119,11 +150,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpDelete("{feedbackId}/{accountId}")]
         public async Task<IActionResult> DeleteFeedback(int feedbackId, int accountId)
         {
             try
             {
+                var customerId = User.FindFirst("CustomerId")?.Value;
+                if (customerId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCartId(feedbackId, int.Parse(customerId));
+                if (!checkMatchedId)
+                {
+                    return Forbid();
+                }
                 var response = await _service.DeleteFeedback(feedbackId, accountId);
                 if (response)
                 {

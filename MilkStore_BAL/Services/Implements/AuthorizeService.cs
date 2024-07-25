@@ -1,4 +1,5 @@
 ﻿using MilkStore_BAL.Services.Interfaces;
+using MilkStore_DAL.Entities;
 using MilkStore_DAL.UnitOfWorks.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,26 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
+        public async Task<bool> CheckAuthorizeByCartId(int cartId, int customerId)
+        {
+            try
+            {
+                var cart = (await _unitOfWork.CartRepository.GetByIDAsync(cartId));
+                if (cart != null)
+                {
+                    if (cart.CustomerId == customerId)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<(bool isMatchedCustomer, bool isAuthorizedAccount)> CheckAuthorizeByCustomerId(int customerId, int accountId)
         {
             try
@@ -67,6 +88,57 @@ namespace MilkStore_BAL.Services.Implements
                     if (accountJwt.RoleId == 1 || accountJwt.RoleId == 2)
                     {
                         isAuthorizedAccount = true;
+                    }
+                }
+                return (isMatchedCustomer, isAuthorizedAccount);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> CheckAuthorizeByFeedbackId(int feedbackId, int customerId)
+        {
+            try
+            {
+                var feedback = (await _unitOfWork.FeedbackRepository.GetByIDAsync(feedbackId));
+                if (feedback != null)
+                {
+                    if (feedback.CustomerId == customerId)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<(bool isMatchedCustomer, bool isAuthorizedAccount)> CheckAuthorizeByOrderId(int orderId, int accountId)
+        {
+            try
+            {
+                bool isAuthorizedAccount = false;
+                bool isMatchedCustomer = false;
+                var accountJwt = await _unitOfWork.AccountRepository.GetByIDAsync(accountId);
+                if (accountJwt != null)
+                {
+                    if (accountJwt.RoleId == 1 || accountJwt.RoleId == 2)
+                    {
+                        isAuthorizedAccount = true;
+                    }
+                }
+                var order = (await _unitOfWork.OrderRepository.GetByIDAsync(orderId));
+                if (order != null)
+                {
+                    var customer = await _unitOfWork.CustomerRepository.GetByIDAsync(order.CustomerId);
+                    if (customer.AccountId == accountId)
+                    {
+                        isMatchedCustomer = true;
                     }
                 }
                 return (isMatchedCustomer, isAuthorizedAccount);

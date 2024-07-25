@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MilkStore_BAL.ModelViews.ProductDTOs;
@@ -16,6 +17,7 @@ namespace MilkStore.Controllers
             _categoryService = categoryService;
         }
 
+        [AllowAnonymous]
         [HttpGet("/api/v1/categories")]
         public async Task<IActionResult> GetAll()
         {
@@ -27,6 +29,7 @@ namespace MilkStore.Controllers
             return Ok(categories);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
@@ -45,6 +48,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireAdminOrStaffRole")]
         [HttpPost()]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto request)
         {
@@ -67,6 +71,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireAdminOrStaffRole")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto request, int id)
         {

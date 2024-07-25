@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MilkStore_BAL.ModelViews.VoucherOfShopDTOs;
 using MilkStore_BAL.Services.Interfaces;
@@ -15,6 +16,7 @@ namespace MilkStore.Controllers
             _voucherOfShopService = voucherOfShopService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -29,6 +31,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{voucherId}")]
         public async Task<IActionResult> Get(int voucherId)
         {
@@ -47,6 +50,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpGet("admin")]
         public async Task<IActionResult> GetByAdmin()
         {
@@ -61,6 +65,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpGet("admin/{voucherId}")]
         public async Task<IActionResult> GetByAdmin(int voucherId)
         {
@@ -79,6 +84,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPost]
         public async Task<IActionResult> Post (VoucherOfShopDtoRequest voucherOfShopDTORequest)
         {
@@ -100,6 +106,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPut("{voucherId}")]
         public async Task<IActionResult> Put(int voucherId, [FromBody] VoucherOfShopDtoRequest voucherOfShopDTORequest)
         {
@@ -128,6 +135,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPut("voucherId={voucherId}&status={status}")]
         public async Task<IActionResult> UpdateStatus(int voucherId, bool status)
         {

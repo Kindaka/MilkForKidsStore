@@ -15,6 +15,6 @@ namespace MilkStore_BAL.Services.Interfaces
         Task<bool> ValidateExchangedPoint(int exchangedPoint, int customerId);
         Task<List<OrderDtoResponse>> Get();
         Task<OrderDtoResponse?> Get(int id);
-        Task<List<OrderDtoResponse>> GetByCustomerId(int customerId);
+        Task<List<OrderDtoResponse>> GetByCustomerId(int customerId, int status);
     }
 }

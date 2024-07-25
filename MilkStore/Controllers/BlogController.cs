@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MilkStore_BAL.ModelViews.BlogDTOs;
@@ -21,6 +22,7 @@ namespace MilkStore.Controllers
             _service = service;
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpGet("GetAllBlogByBlogId/{blogId}")]
         public async Task<IActionResult> GetAllBlogByBlogId(int blogId)
         {
@@ -40,6 +42,8 @@ namespace MilkStore.Controllers
             }
 
         }
+
+        [AllowAnonymous]
         [HttpGet("GetAllBlog")]
         public async Task<IActionResult> GetAllBlog()
         {
@@ -59,6 +63,8 @@ namespace MilkStore.Controllers
             }
 
         }
+
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPost("createBlog")]
         public async Task<IActionResult> CreateBlog([FromBody] BlogProductDto blogItems)
         {

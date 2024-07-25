@@ -25,6 +25,7 @@ namespace MilkStore.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPost("add-product")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductDtoRequest productView)
         {
@@ -74,7 +75,7 @@ namespace MilkStore.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPost("add-product-firebase")]
         public async Task<IActionResult> AddProduct([FromForm] ProductDtoUsingFireBaseRequest request)
         {
@@ -104,7 +105,7 @@ namespace MilkStore.Controllers
         }
 
 
-
+        [AllowAnonymous]
         [HttpGet("get-all-products")]
         public async Task<IActionResult> GetAllProduct([FromQuery] int CategoryId)
         {
@@ -134,6 +135,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("get-product-by-id/{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -160,6 +162,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("search-product/{searchInput}")]
         public async Task<IActionResult> SearchProduct(string searchInput)
         {
@@ -196,7 +199,7 @@ namespace MilkStore.Controllers
             }
         }
 
-
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPut("update-product/{id}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDtoRequest productView, int id)
         {
@@ -252,6 +255,7 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireStaffRole")]
         [HttpPut("update-status/{id}")]
         public async Task<IActionResult> UpdateStatus(int id)
         {

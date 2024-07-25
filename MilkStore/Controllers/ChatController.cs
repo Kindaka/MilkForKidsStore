@@ -18,7 +18,7 @@ namespace MilkStore.Controllers
             _chatService = chatService;
         }
 
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("create-room")]
         public async Task<IActionResult> CreateRoom([FromBody] string roomId)
         {
@@ -31,7 +31,7 @@ namespace MilkStore.Controllers
             return Ok(new { message = "Chat room created", roomId });
         }
 
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("send-message")]
         public async Task<IActionResult> SendMessage([FromBody] ChatMessage message)
         {
@@ -47,7 +47,7 @@ namespace MilkStore.Controllers
             return Ok();
         }
 
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet("get-messages/{roomId}")]
         public async Task<IActionResult> GetMessages(string roomId)
         {
@@ -55,7 +55,7 @@ namespace MilkStore.Controllers
             return Ok(messages);
         }
 
-        [Authorize]
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpGet("get-rooms")]
         public async Task<IActionResult> GetRooms()
         {

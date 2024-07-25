@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using MilkStore_BAL.ModelViews.CartDTOs;
 using MilkStore_BAL.Services.Interfaces;
+using MilkStore_DAL.Entities;
 
 namespace MilkStore.Controllers
 {
@@ -10,19 +14,31 @@ namespace MilkStore.Controllers
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartItemService;
+        private readonly IAuthorizeService _authorizeService;
         private readonly string _imagesDirectory;
 
-        public CartController(ICartService cartItemService, IWebHostEnvironment env)
+        public CartController(ICartService cartItemService, IAuthorizeService authorizeService, IWebHostEnvironment env)
         {
             _cartItemService = cartItemService;
+            _authorizeService = authorizeService;
             _imagesDirectory = Path.Combine(env.ContentRootPath, "img", "product");
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpPost]
         public async Task<IActionResult> AddToCart([FromBody] CartDtoRequest request)
         {
             try
             {
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCustomerId(request.CustomerId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer) { 
+                    return Forbid();
+                }
                 if (request == null)
                 {
                     return BadRequest("Cannot add empty object to cart");
@@ -43,11 +59,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpGet("{CustomerId}")]
         public async Task<IActionResult> GetCustomerCart(int CustomerId)
         {
             try
             {
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCustomerId(CustomerId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer)
+                {
+                    return Forbid();
+                }
                 var response = await _cartItemService.GetCartByCustomerId(CustomerId);
                 if (!response.Any())
                 {
@@ -76,11 +103,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItemInCart(int id)
         {
             try
             {
+                var customerId = User.FindFirst("CustomerId")?.Value;
+                if (customerId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCartId(id, int.Parse(customerId));
+                if (!checkMatchedId)
+                {
+                    return Forbid();
+                }
                 var check = await _cartItemService.DeleteItemInCart(id);
                 if (check)
                 {
@@ -97,11 +135,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpPut("/api/v1/[controller]/Quantity")]
         public async Task<IActionResult> UpdateItemQuantityInCart([FromQuery] int CartId, [FromQuery] int Quantity)
         {
             try
             {
+                var customerId = User.FindFirst("CustomerId")?.Value;
+                if (customerId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCartId(CartId, int.Parse(customerId));
+                if (!checkMatchedId)
+                {
+                    return Forbid();
+                }
                 var response = await _cartItemService.UpdateItemQuantityInCart(CartId, Quantity);
                 if (response == 1)
                 {

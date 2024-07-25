@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MilkStore_BAL.ModelViews.CustomerDTOs;
+using MilkStore_BAL.Services.Implements;
 using MilkStore_BAL.Services.Interfaces;
+using MilkStore_DAL.Entities;
 
 namespace MilkStore.Controllers
 {
@@ -9,17 +13,30 @@ namespace MilkStore.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private readonly IAuthorizeService _authorizeService;
 
-        public CustomerController(ICustomerService customerService)
+        public CustomerController(ICustomerService customerService, IAuthorizeService authorizeService)
         {
             _customerService = customerService;
+            _authorizeService = authorizeService;
         }
 
+        [Authorize(Policy = "RequireAllRoles")]
         [HttpGet("{customerId}")]
         public async Task<IActionResult> GetCustomerById(int customerId)
         {
             try
             {
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCustomerId(customerId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer && !checkMatchedId.isAuthorizedAccount)
+                {
+                    return Forbid();
+                }
                 var customer = await _customerService.GetCustomerByIdAsync(customerId);
                 if (customer == null)
                 {
@@ -33,11 +50,22 @@ namespace MilkStore.Controllers
             }
         }
 
+        [Authorize(Policy = "RequireCustomerRole")]
         [HttpPut("{customerId}")]
         public async Task<IActionResult> UpdateCustomerInfo(int customerId, [FromBody] UpdateCustomerDto updateDto)
         {
             try
             {
+                var accountId = User.FindFirst("AccountId")?.Value;
+                if (accountId == null)
+                {
+                    return Forbid();
+                }
+                var checkMatchedId = await _authorizeService.CheckAuthorizeByCustomerId(customerId, int.Parse(accountId));
+                if (!checkMatchedId.isMatchedCustomer)
+                {
+                    return Forbid();
+                }
                 var result = await _customerService.UpdateCustomerInfoAsync(customerId, updateDto);
                 if (!result)
                 {
