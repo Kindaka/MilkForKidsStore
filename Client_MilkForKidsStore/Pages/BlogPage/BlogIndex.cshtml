@@ -1,0 +1,53 @@
+﻿@page
+@model Client_MilkForKidsStore.Pages.BlogPage.BlogIndexModel
+@{
+}
+<!-- Blog Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="border-start border-5 border-primary ps-5 mb-5" style="max-width: 600px;">
+            <h6 class="text-primary text-uppercase">Blog</h6>
+            <h1 class="display-5 text-uppercase mb-0">Article from our blog post</h1>
+        </div>
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="blog-item">
+                     @foreach (var item in Model.Blogs)
+            {
+                    <div class="row g-0 bg-light overflow-hidden">
+                        <div class="col-12 col-sm-5 h-100">
+                                @if (item.BlogImage != null && item.BlogImage.Any())
+                                {
+                                    <img class="img-fluid h-100" src="@item.BlogImage" style="object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <img class="img-fluid mb-4" src="~/img/default_milk.jpg" alt="Default Milk Image">
+                                }
+                        </div>
+                        <div class="col-12 col-sm-7 h-100 d-flex flex-column justify-content-center">
+                            <div class="p-4">
+                                <div class="d-flex mb-3">
+                                        <small><i class="bi bi-calendar-date me-2"></i>@item.BlogTitle</small>
+                                </div>
+                                    <h5 class="text-uppercase mb-3 truncate">@item.BlogTitle</h5>
+                                    <p class="truncate">@item.BlogContent</p>
+                                    <a class="text-primary text-uppercase" asp-page="/BlogPage/BlogDetail" asp-route-blogId="@item.BlogId">Read More<i class="bi bi-chevron-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Blog End -->
+<style>
+    .truncate {
+        width: 200px; 
+        white-space: nowrap;
+        overflow: hidden; 
+        text-overflow: ellipsis;
+    }
+</style>

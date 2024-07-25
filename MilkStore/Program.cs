@@ -83,11 +83,11 @@ builder.Services.AddCors();
 
 builder.Services.AddHttpContextAccessor();
 
-// Configure Firebase
-FirebaseApp.Create(new AppOptions()
-{
-    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
-});
+//// Configure Firebase
+//FirebaseApp.Create(new AppOptions()
+//{
+//    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
+//});
 
 // Add Hangfire services.
 builder.Services.AddHangfire(configuration => configuration

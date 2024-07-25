@@ -42,6 +42,13 @@ namespace MilkStore_BAL.Mapper
             CreateMap<Feedback, FeedbackDtoResponse>().ReverseMap();
             CreateMap<Feedback, UpdateFeedbackDtoRequest>().ReverseMap();
             CreateMap<Blog, BlogDtoResponse>().ReverseMap();
+                       //.ForMember(dest => dest.BlogProductId, opt => opt.MapFrom(src => src.BlogProducts.Select(bp => bp.ProductId)))
+                       //.ForMember(dest => dest.BlogProducts, opt => opt.MapFrom(src => src.BlogProducts.Select(bp => new ProductDtoResponse
+                       //{
+                       //    ProductId = bp.ProductId,
+                       //    ProductName = bp.Product.ProductName,
+                       //    ProductPrice = (double)bp.Product.ProductPrice
+                       //}))); 
             CreateMap<BlogDtoRequest, Blog>();
         }
     }
