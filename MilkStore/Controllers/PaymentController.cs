@@ -35,12 +35,13 @@ namespace MilkStore.Controllers
 
                 if (result != null)
                 {
-                    string url = "https://localhost:7190/PaymentPage/Success";
-                    return Redirect(url);
+                    string urlSuccess = "https://localhost:7190/PaymentPage/Success";
+                    return Redirect(urlSuccess);
                 }
                 else
                 {
-                    return NotFound("Order does not created");
+                    string urlError = "https://localhost:7190/PaymentPage/Error";
+                    return Redirect(urlError);
                 }
             }
             catch (Exception ex)
