@@ -1,0 +1,177 @@
+﻿@page
+@model Client_MilkForKidsStore.Pages.MyCartPageModel
+@{
+    var message = TempData["Message"] as string;
+}
+
+@if(!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <h1>@message</h1>
+    </div>
+} else
+{
+    <div class="container-fluid bg-light">
+        <div class="row p-5">
+            <div class="col-lg-8 table-responsive mb-5 border border-3">
+                <table class="table table-light table-borderless table-hover text-center mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Products</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Remove</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                        @foreach (var item in Model.Carts)
+                        {
+                            <tr class="cart-item" data-cart-id="@item.CartId">
+                                <td class="align-middle">
+                                    @if (item.ProductView.Images != null && item.ProductView.Images.Any())
+                                    {
+                                        <img class="img-fluid mb-4" src="data:image/png;base64,@item.ProductView.Images.First().ImageProduct1" style="width: 50px;" alt="Product Image">
+                                    }
+                                    else
+                                    {
+                                        <img class="img-fluid mb-4" src="~/img/default_milk.jpg" style="width: 50px;" alt="Default Milk Image">
+                                    }
+                                    @item.ProductView.ProductName
+                                </td>
+                                <td class="align-middle" data-price="@item.ProductView.ProductPrice">
+                                    @item.ProductView.ProductPrice
+                                </td>
+                                <td class="align-middle">
+                                    <div class="input-group quantity mx-auto" style="width: 100px;">
+                                        <button class="btn btn-sm btn-outline-primary btn-minus" type="button">-</button>
+                                        <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center quantity-input" value="@item.CartQuantity" readonly>
+                                        <button class="btn btn-sm btn-outline-primary btn-plus" type="button">+</button>
+                                    </div>
+                                </td>
+                                <td class="align-middle" data-total="@(item.ProductView.ProductPrice * item.CartQuantity)">
+                                    @(item.ProductView.ProductPrice * item.CartQuantity)
+                                </td>
+                                <td class="align-middle"><button class="btn btn-sm btn-danger">x</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-4 mb-5 border border-3">
+                <form class="mb-30" action="">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-0 p-4" placeholder="Coupon Code">
+                        <button class="btn btn-primary" type="submit">Apply Coupon</button>
+                    </div>
+                </form>
+                <h5 class="text-uppercase fw-bold mb-3"><span class="bg-secondary px-3 py-1 rounded-pill">Cart Summary</span></h5>
+                <div class="bg-light p-30 mb-5">
+                    <div class="border-bottom pb-2">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6>Subtotal</h6>
+                            <h6 id="cart-subtotal"></h6>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5>Total</h5>
+                            <h5 id="cart-total"></h5>
+                        </div>
+                        <form method="post">
+                            <button class="btn btn-primary w-100 fw-bold my-3 py-3" type="submit">Proceed To Checkout</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Update Total Price
+            updateCartTotal();
+
+            // Quantity Increase/Decrease
+            $('.btn-plus').click(function () {
+                let cartItem = $(this).closest('.cart-item');
+                let quantityInput = cartItem.find('.quantity-input');
+                let quantity = parseInt(quantityInput.val());
+                let price = parseFloat(cartItem.find('[data-price]').data('price'));
+                quantity++;
+                quantityInput.val(quantity);
+                cartItem.find('[data-total]').text(parseFloat((quantity * price).toFixed(2))).data('total', parseFloat((quantity * price)));
+                updateCartTotal();
+
+                // API Call to update quantity
+                updateItemQuantityInCart(cartItem.data('cart-id'), quantity);
+            });
+
+            $('.btn-minus').click(function () {
+                let cartItem = $(this).closest('.cart-item');
+                let quantityInput = cartItem.find('.quantity-input');
+                let quantity = parseInt(quantityInput.val());
+                let price = parseFloat(cartItem.find('[data-price]').data('price'));
+                if (quantity > 1) {
+                    quantity--;
+                    quantityInput.val(quantity);
+                    cartItem.find('[data-total]').text(parseFloat((quantity * price).toFixed(2))).data('total', parseFloat((quantity * price)));
+                }
+                updateCartTotal();
+
+                updateItemQuantityInCart(cartItem.data('cart-id'), quantity);
+            });
+
+            $('.btn-danger').click(function () {
+                let cartItem = $(this).closest('.cart-item');
+                let cartId = cartItem.data('cart-id');
+                updateItemQuantityInCart(cartId, 0);
+
+                cartItem.remove();
+                updateCartTotal();
+            });
+
+            // Function to Update Cart Total
+            function updateCartTotal() {
+                let subtotal = 0;
+                $('.cart-item').each(function () {
+                    subtotal += parseFloat($(this).find('[data-total]').data('total'));
+                });
+                $('#cart-subtotal').text(parseFloat(subtotal.toFixed(2)));
+                $('#cart-total').text(parseFloat(subtotal.toFixed(2)) + 'VND');
+            }
+
+            // API Call to Update Quantity in Cart
+            function updateItemQuantityInCart(cartId, quantity) {
+                $.ajax({
+                    url: `https://localhost:7223/api/v1/Cart/Quantity?CartId=${cartId}&Quantity=${quantity}`, // Replace with your API URL
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        console.log(response); // Log the response from the server
+                        if (response === "Update quantity success") {
+                            console.log("Success")
+                        } else if (response === "Remove item success") {
+                            console.log("Fail")
+                        } else if (response === "Your quantity is greater than number of product in stock" ||
+                            response === "Product is not exist" ||
+                            response === "Item in cart is not exist" ||
+                            response === "Cannot update") {
+                            alert(response);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error('Error updating cart:', textStatus, errorThrown);
+                        alert('An error occurred while updating the cart. Please try again.');
+                    }
+                });
+            }
+
+            
+        });
+    </script>
+}

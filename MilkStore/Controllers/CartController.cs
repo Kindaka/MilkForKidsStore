@@ -51,7 +51,7 @@ namespace MilkStore.Controllers
                 var response = await _cartItemService.GetCartByCustomerId(CustomerId);
                 if (!response.Any())
                 {
-                    return NotFound("No item in your cart");
+                    return Ok(response);
                 }
                 foreach (var item in response)
                 {
@@ -97,7 +97,7 @@ namespace MilkStore.Controllers
             }
         }
 
-        [HttpPut("api/v1/[controller]/Quantity")]
+        [HttpPut("/api/v1/[controller]/Quantity")]
         public async Task<IActionResult> UpdateItemQuantityInCart([FromQuery] int CartId, [FromQuery] int Quantity)
         {
             try

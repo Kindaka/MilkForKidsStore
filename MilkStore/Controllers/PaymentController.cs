@@ -35,7 +35,8 @@ namespace MilkStore.Controllers
 
                 if (result != null)
                 {
-                    return Ok(result);
+                    string url = "https://localhost:7190/PaymentPage/Success";
+                    return Redirect(url);
                 }
                 else
                 {

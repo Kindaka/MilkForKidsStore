@@ -1,0 +1,90 @@
+﻿@page
+@model Client_MilkForKidsStore.Pages.ProductPage.ProductDetailModel
+@{
+    var successMessage = TempData["SuccessMessage"] as string;
+    var failMessage = TempData["ErrorMessage"] as string;
+}
+
+@if(!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+} 
+@if(!string.IsNullOrEmpty(failMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @failMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container py-5 bg-light">
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <div class="image-container">
+                <img id="mainProductImage" class="img-fluid" src="~/img/default_milk.jpg" alt="Product Image">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <h3 class="text-uppercase mb-4">@Model.Product?.ProductName</h3>
+            <h5 class="text-primary mb-4" id="price">@Model.Product?.ProductPrice VND</h5>
+            <p class="mb-4">
+                @Model.Product?.ProductInfor
+            </p>
+            <div class="d-flex mb-4">
+                <strong class="text-uppercase me-2">Categories:</strong>
+                <span>@Model.Product?.category?.ProductCategoryName</span>
+            </div>
+            <form method="post">
+            <div class="d-flex align-items-center mb-4">
+                <strong class="text-uppercase me-2">Quantity:</strong>
+                <div class="input-group quantity mx-1" style="width: 130px;">
+                    <div class="input-group-btn">
+                        <button id="btnMinus" class="btn btn-primary btn-minus">
+                            <i class="bi bi-dash"></i>
+                        </button>
+                    </div>
+                    <input id="quantity" name="Quantity" class="form-control bg-light border-0 text-center" value="1">
+                    <div class="input-group-btn">
+                        <button id="btnPlus" class="btn btn-primary btn-plus">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="ProductId" value="@Model.Product?.ProductId">
+            <button class="btn btn-primary text-uppercase px-5 mb-4" type="submit">Add To Cart</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnMinus = document.querySelector('#btnMinus');
+            const btnPlus = document.querySelector('#btnPlus');
+            const quantityInput = document.querySelector('#quantity');
+            const price = document.querySelector('#price');
+
+            let currentQuantity = parseInt(quantityInput.value);
+
+            btnMinus.addEventListener('click', function (event) {
+                event.preventDefault();
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    quantityInput.value = currentQuantity;
+                }
+            });
+
+            btnPlus.addEventListener('click', function (event) {
+                event.preventDefault();
+                currentQuantity++;
+                quantityInput.value = currentQuantity;
+            });
+
+        });
+    </script>
+}

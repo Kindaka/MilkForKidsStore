@@ -52,6 +52,18 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAllRoles", policy => policy.RequireClaim("RoleId", "1", "2", "3"));
 });
 
+//Config CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 // Auto mapper
 builder.Services.AddAutoMapper(typeof(Program), typeof(MappingProfile));
 
@@ -84,10 +96,10 @@ builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 
 // Configure Firebase
-FirebaseApp.Create(new AppOptions()
-{
-    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
-});
+//FirebaseApp.Create(new AppOptions()
+//{
+//    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),
+//});
 
 // Add Hangfire services.
 builder.Services.AddHangfire(configuration => configuration
@@ -161,7 +173,7 @@ recurringJobManager.AddOrUpdate(
     Cron.Minutely
     );
 
-app.UseCors();
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
