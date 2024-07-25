@@ -4,6 +4,14 @@
     var successMessage = TempData["SuccessMessage"] as string;
     var failMessage = TempData["ErrorMessage"] as string;
 }
+@using System.Security.Claims
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    var user = HttpContextAccessor.HttpContext.User;
+    var role = user.FindFirst("RoleId")?.Value;
+    var isAuthenticated = user.Identity.IsAuthenticated;
+}
 
 @if(!string.IsNullOrEmpty(successMessage))
 {
@@ -55,7 +63,15 @@
                 </div>
             </div>
             <input type="hidden" name="ProductId" value="@Model.Product?.ProductId">
-            <button class="btn btn-primary text-uppercase px-5 mb-4" type="submit">Add To Cart</button>
+                @if(isAuthenticated)
+                {
+                    <button class="btn btn-primary text-uppercase px-5 mb-4" type="submit">Add To Cart</button>
+                }
+                else
+                {
+                    <a class="btn btn-primary text-uppercase px-5 mb-4" asp-area="" asp-page="/AuthenticatePage/Login">Add To Cart</a>
+                }
+
             </form>
         </div>
     </div>

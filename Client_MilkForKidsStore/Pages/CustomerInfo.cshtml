@@ -13,7 +13,48 @@
         </div>
     }
 
+    <div class="rts-shop-section section-gap">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-3">
+                    <div class="side-sticky">
+                        <div class="shop-side-action">
+                            <div class="action-item">
+                                <div class="action-top">
+                                    <span class="action-title"><i class="bi bi-person"></i> Tài khoản của tôi</span>
+                                </div>
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <a href="/CustomerInfo">
+                                            <div class="color-item">
+                                                <span class="color-name">Hồ sơ</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/OrdersCustomer?status=-1">
+                                            <div class="color-item">
+                                                <span class="color-name">Đơn hàng của bạn</span>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form id="logoutForm" method="post" asp-page="/AuthenticatePage/Login" asp-page-handler="Logout" style="display: inline;">
+                                        <a href="" onclick="document.getElementById('logoutForm').submit(); return false;">
+                                            <div class="color-item">
+                                                <span class="color-name">Đăng xuất</span>
+                                            </div>
+                                        </a>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
     <!-- Display existing customer information -->
+    <div class="col-xl-9">
+        <div class="border rounded p-3">
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">Customer Details</h4>
@@ -67,6 +108,11 @@
                 </div>
                 <button type="submit" class="btn btn-success">Update</button>
             </form>
+        </div>
+    </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
