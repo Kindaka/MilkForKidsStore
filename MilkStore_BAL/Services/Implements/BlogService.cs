@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using MilkStore_BAL.ModelViews.BlogDTOs;
 using MilkStore_BAL.ModelViews.BlogProductDTOs;
+using MilkStore_BAL.ModelViews.ProductDTOs;
 using MilkStore_BAL.Services.Interfaces;
 using MilkStore_DAL.Entities;
 using MilkStore_DAL.UnitOfWorks.Interfaces;
@@ -95,15 +96,39 @@ namespace MilkStore_BAL.Services.Implements
             }
         }
 
-        public async Task<IList<BlogDtoResponse>> GetAllBlogByBlogId(int blogId)
+        public async Task<BlogDtoResponse> GetAllBlogByBlogId(int blogId)
         {
-           
-            var getAllFbOShop = await _unitOfWork.BlogRepository
-                                        .GetAsync(filter: x => x.BlogId == blogId
-                                                            && x.Status != true);
-            var response = _mapper.Map<IList<BlogDtoResponse>>(getAllFbOShop);
 
-            return response;
+           
+            var blog = await _unitOfWork.BlogRepository
+                               .SingleOrDefaultAsync(x => x.BlogId == blogId && x.Status == true);
+
+            if (blog == null)
+                return null;
+
+            var blogProducts = await _unitOfWork.BlogProductRepository
+                                                .GetAllAsync(bp => bp.BlogId == blogId);
+            var productIds = blogProducts.Select(bp => bp.ProductId).ToList();
+
+            var products = await _unitOfWork.ProductRepository
+                                            .GetAllAsync(p => productIds.Contains(p.ProductId));
+
+            var response = new BlogDtoResponse
+            {
+                BlogId = blog.BlogId,
+                BlogTitle = blog.BlogTitle,
+                BlogContent = blog.BlogContent,
+                BlogImage = blog.BlogImage,
+                BlogProducts = products.Select(p => new ProductDtoResponse
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    ProductPrice = (double)p.ProductPrice
+                }).ToList(),
+                Status = blog.Status
+            };
+
+            return (BlogDtoResponse)response;
         }
 
         public async Task<int> ValidateProductOfBolg(BlogProductDto blogItems)

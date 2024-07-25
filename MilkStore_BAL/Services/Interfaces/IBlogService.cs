@@ -14,7 +14,7 @@ namespace MilkStore_BAL.Services.Interfaces
     {
         Task<IList<BlogDtoResponse>> GetAllBlog();
 
-        Task<IList<BlogDtoResponse>> GetAllBlogByBlogId(int BlogId);
+        Task<BlogDtoResponse> GetAllBlogByBlogId(int BlogId);
         Task<int> ValidateProductOfBolg(BlogProductDto blogItems);
 
         Task<string> CreateBlog(BlogProductDto blogItems);

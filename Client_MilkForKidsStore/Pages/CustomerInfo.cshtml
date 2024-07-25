@@ -1,0 +1,72 @@
+﻿@page
+@model Client_MilkForKidsStore.Pages.CustomerInfoModel
+
+
+<div class="container mt-5">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["Message"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Display existing customer information -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Customer Details</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold">User Name</dt>
+                <dd class="col-sm-9">@Model.Customer.UserName</dd>
+
+                <dt class="col-sm-3 fw-bold">Phone</dt>
+                <dd class="col-sm-9">@Model.Customer.Phone</dd>
+
+                <dt class="col-sm-3 fw-bold">Address</dt>
+                <dd class="col-sm-9">@Model.Customer.Address</dd>
+
+                <dt class="col-sm-3 fw-bold">Date of Birth</dt>
+                <dd class="col-sm-9">@Model.Customer.Dob?.ToString("yyyy-MM-dd")</dd>
+
+                <dt class="col-sm-3 fw-bold">Points</dt>
+                <dd class="col-sm-9">@Model.Customer.Point</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Form for updating customer information -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Update Customer Information</h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="form-group mb-3">
+                    <label asp-for="UpdateCustomer.UserName" class="form-label"></label>
+                    <input asp-for="UpdateCustomer.UserName" class="form-control" placeholder="Enter username" required="" />
+                    <span asp-validation-for="UpdateCustomer.UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="UpdateCustomer.Phone" class="form-label"></label>
+                    <input asp-for="UpdateCustomer.Phone" class="form-control" placeholder="Enter phone number" required="" />
+                    <span asp-validation-for="UpdateCustomer.Phone" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="UpdateCustomer.Address" class="form-label"></label>
+                    <input asp-for="UpdateCustomer.Address" class="form-control" placeholder="Enter address" required="" />
+                    <span asp-validation-for="UpdateCustomer.Address" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="UpdateCustomer.Dob" class="form-label"></label>
+                    <input asp-for="UpdateCustomer.Dob" class="form-control" type="date" required="" />
+                    <span asp-validation-for="UpdateCustomer.Dob" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-success">Update</button>
+            </form>
+        </div>
+    </div>
+</div>

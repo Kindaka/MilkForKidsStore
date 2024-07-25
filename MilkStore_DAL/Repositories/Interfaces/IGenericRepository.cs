@@ -26,6 +26,7 @@ namespace MilkStore_DAL.Repositories.Interfaces
             int? pageSize = null);
         
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression);
+        Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
 
         Task AddAsync(TEntity entity);
 

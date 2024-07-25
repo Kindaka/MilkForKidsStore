@@ -1,32 +1,30 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MilkStore_BAL.ModelViews.ChatDTOs;
+using MilkStore_BAL.ModelViews.CustomerDTOs;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace Client_MilkForKidsStore.Pages
 {
-    public class MessageModel : PageModel
+    public class CustomerInfoModel : PageModel
     {
         private readonly HttpClient _httpClient;
 
-        public MessageModel(HttpClient httpClient)
+        public CustomerInfoModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            MessageHistory = new List<MessageDtoResponse>(); // Initialize MessageHistory
         }
 
         [BindProperty(SupportsGet = true)]
         public int CustomerId { get; set; }
 
-        public IList<MessageDtoResponse> MessageHistory { get; set; }
-        public string CustomerName { get; set; }
+        public CustomerDto Customer { get; set; } = new CustomerDto();
+
         [BindProperty]
-        public string Content { get; set; }
+        public UpdateCustomerDto UpdateCustomer { get; set; } = new UpdateCustomerDto();
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -46,20 +44,17 @@ namespace Client_MilkForKidsStore.Pages
                 CustomerId = customerId;
             }
 
-            var response = await _httpClient.GetAsync($"https://localhost:7223/api/v1/Message/history/{CustomerId}");
+            var response = await _httpClient.GetAsync($"https://localhost:7223/api/v1/Customer/{CustomerId}");
 
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                var chatHistoryResponse = JsonConvert.DeserializeObject<ChatHistoryResponse>(jsonResponse);
-                MessageHistory = chatHistoryResponse.MessageHistory ?? new List<MessageDtoResponse>();
-                CustomerName = chatHistoryResponse.CustomerName;
-                System.Diagnostics.Debug.WriteLine("Chat History: " + JsonConvert.SerializeObject(MessageHistory));
+                Customer = JsonConvert.DeserializeObject<CustomerDto>(jsonResponse) ?? new CustomerDto();
             }
             else
             {
-                MessageHistory = new List<MessageDtoResponse>();
-                TempData["Message"] = "Chat history not found.";
+                TempData["Message"] = "Customer not found.";
+                return Page();
             }
 
             return Page();
@@ -83,26 +78,27 @@ namespace Client_MilkForKidsStore.Pages
                 CustomerId = customerId;
             }
 
-            var messageRequest = new MessageDtoRequest
+            var updateRequest = new UpdateCustomerDto
             {
-                CustomerId = CustomerId,
-                Content = Content,
-                SendTime = DateTime.Now
+                UserName = UpdateCustomer.UserName,
+                Phone = UpdateCustomer.Phone,
+                Address = UpdateCustomer.Address,
+                Dob = UpdateCustomer.Dob
             };
 
-            var jsonContent = JsonConvert.SerializeObject(messageRequest);
+            var jsonContent = JsonConvert.SerializeObject(updateRequest);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("https://localhost:7223/api/v1/Message", httpContent);
+            var response = await _httpClient.PutAsync($"https://localhost:7223/api/v1/Customer/{CustomerId}", httpContent);
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["Message"] = "Message sent successfully.";
-                return RedirectToPage(); // Reload the page to show updated message history
+                TempData["Message"] = "Customer information updated successfully.";
+                return RedirectToPage(new { CustomerId });
             }
             else
             {
-                TempData["Message"] = "Error sending message.";
+                TempData["Message"] = "Error updating customer information.";
                 return Page();
             }
         }

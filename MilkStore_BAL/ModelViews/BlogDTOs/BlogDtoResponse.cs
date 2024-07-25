@@ -1,7 +1,9 @@
-﻿using System;
+﻿using MilkStore_BAL.ModelViews.ProductDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MilkStore_BAL.ModelViews.BlogDTOs
@@ -13,5 +15,6 @@ namespace MilkStore_BAL.ModelViews.BlogDTOs
         public string BlogContent { get; set; } = null!;
         public string? BlogImage { get; set; }
         public bool Status { get; set; }
+        public List<ProductDtoResponse> BlogProducts { get; set; } = new List<ProductDtoResponse>();
     }
 }

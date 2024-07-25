@@ -135,6 +135,11 @@ namespace MilkStore_DAL.Repositories.Implements
             return await dbSet.FindAsync(id);
         }
 
+        public async Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _context.Set<TEntity>().SingleOrDefaultAsync(predicate);
+        }
+
         public async Task UpdateAsync(TEntity entityToUpdate)
         {
             dbSet.Attach(entityToUpdate);

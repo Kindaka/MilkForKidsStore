@@ -1,0 +1,50 @@
+﻿@page
+@model Client_MilkForKidsStore.Pages.BlogPage.BlogDetailModel
+@{
+}
+<!-- Blog Start -->
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <!-- Blog Detail Start -->
+            <div class="mb-5">
+                @if (@Model.Blog.BlogImage != null && @Model.Blog.BlogImage.Any())
+                                {
+                    <img class="img-fluid w-100 rounded mb-5" src="@Model.Blog.BlogImage" alt="Blog Image">
+                }
+                else
+                {
+                    <img class="img-fluid mb-4" src="~/img/default_milk.jpg" alt="Default Blog Image">
+                }
+                <h1 class="text-uppercase mb-4">@Model.Blog.BlogTitle</h1>
+                <p>
+                    @Model.Blog.BlogContent
+                </p>
+                <ul>
+                    @foreach (var product in Model.Blog.BlogProducts)
+                    {
+                        <li>
+                            <a class="text-primary text-uppercase" asp-page="/ProductPage/ProductDetail" asp-route-productId="@product.ProductId">@product.ProductName</a>
+                            - @product.ProductPrice.ToString("C")
+                        </li>
+                    }
+                </ul>
+               
+            </div>
+            <!-- Blog Detail End -->         
+        </div>
+        <!-- Sidebar Start -->
+        <div class="col-lg-4">
+            <!-- Search Form Start -->
+            <div class="mb-5">
+                <div class="input-group">
+                    <input type="text" class="form-control p-3" placeholder="Keyword">
+                    <button class="btn btn-primary px-4"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+            <!-- Search Form End -->
+        </div>
+        <!-- Sidebar End -->
+    </div>
+</div>
+<!-- Blog End -->

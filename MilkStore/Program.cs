@@ -86,6 +86,7 @@ builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IBlogService, BlogService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 // Background service containers
 builder.Services.AddScoped<IOrderBackgroundService, OrderBackgroundService>();
@@ -95,7 +96,7 @@ builder.Services.AddCors();
 
 builder.Services.AddHttpContextAccessor();
 
-// Configure Firebase
+//// Configure Firebase
 //FirebaseApp.Create(new AppOptions()
 //{
 //    Credential = GoogleCredential.FromFile(builder.Configuration["Firebase:Chat:CredentialPath"]),

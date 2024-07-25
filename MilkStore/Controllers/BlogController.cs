@@ -27,7 +27,7 @@ namespace MilkStore.Controllers
             try
             {
                 var getAll = await _service.GetAllBlogByBlogId(blogId);
-                if (getAll.IsNullOrEmpty())
+                if (getAll == null)
                 {
                     return Ok("Blog is empty !!");
                 }
@@ -80,7 +80,5 @@ namespace MilkStore.Controllers
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
-
-
     }
 }
