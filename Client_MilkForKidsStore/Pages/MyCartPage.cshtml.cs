@@ -5,6 +5,7 @@ using MilkStore_BAL.ModelViews.CartDTOs;
 using MilkStore_BAL.ModelViews.OrderDTOs;
 using MilkStore_DAL.Entities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 
@@ -14,6 +15,7 @@ namespace Client_MilkForKidsStore.Pages
     {
         private readonly HttpClient _httpClient;
         public List<CartDtoResponse>? Carts;
+        public string? JWT;
 
         public MyCartPageModel(HttpClient httpClient)
         {
@@ -23,7 +25,10 @@ namespace Client_MilkForKidsStore.Pages
         {
             try
             {
-                var customerId = GetCustomerId();
+                var jwtToken = Request.Cookies["jsonToken"];
+                JWT = jwtToken?.ToString();
+                var customerId = GetCustomerId(jwtToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwtToken);
                 var response = await _httpClient.GetAsync($"https://localhost:7223/api/v1/Cart/{customerId}");
                 if(response.IsSuccessStatusCode)
                 {
@@ -53,7 +58,10 @@ namespace Client_MilkForKidsStore.Pages
         {
             try
             {
-                var customerId = GetCustomerId();
+                var jwtToken = Request.Cookies["jsonToken"];
+                JWT = jwtToken?.ToString();
+                var customerId = GetCustomerId(jwtToken);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwtToken);
                 var response = await _httpClient.GetAsync($"https://localhost:7223/api/v1/Cart/{customerId}");
                 if (response.IsSuccessStatusCode)
                 {
@@ -110,12 +118,11 @@ namespace Client_MilkForKidsStore.Pages
             }
         }
 
-        public int GetCustomerId()
+        public int GetCustomerId(string? accessToken)
         {
-            var accessToken = Request.Cookies["jsonToken"];
             if (string.IsNullOrEmpty(accessToken))
             {
-                RedirectToPage("/Login");
+                RedirectToPage("/AuthenticatePage/Login");
             }
             else
             {

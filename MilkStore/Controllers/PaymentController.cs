@@ -10,6 +10,8 @@ namespace MilkStore.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
+        private static readonly string URL_SUCCESS = "https://localhost:7190/PaymentPage/Success";
+        private static readonly string URL_ERROR = "https://localhost:7190/PaymentPage/Error";
 
         public PaymentController(IPaymentService paymentService)
         {
@@ -24,8 +26,8 @@ namespace MilkStore.Controllers
                 if (parameters.vnp_BankTranNo == null)
                 {
                     var res = await _paymentService.CancelTransaction(parameters);
-                    if (res != null) { 
-                        return BadRequest(res);
+                    if (res != null) {
+                        return Redirect(URL_ERROR);
                     } else
                     {
                         return NotFound("Order does not created");
@@ -35,13 +37,11 @@ namespace MilkStore.Controllers
 
                 if (result != null)
                 {
-                    string urlSuccess = "https://localhost:7190/PaymentPage/Success";
-                    return Redirect(urlSuccess);
+                    return Redirect(URL_SUCCESS);
                 }
                 else
                 {
-                    string urlError = "https://localhost:7190/PaymentPage/Error";
-                    return Redirect(urlError);
+                    return Redirect(URL_ERROR);
                 }
             }
             catch (Exception ex)

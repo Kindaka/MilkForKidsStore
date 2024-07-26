@@ -133,6 +133,8 @@
 
                 cartItem.remove();
                 updateCartTotal();
+
+                updateItemQuantityInCart(cartItem.data('cart-id'), 0);
             });
 
             // Function to Update Cart Total
@@ -145,12 +147,15 @@
                 $('#cart-total').text(parseFloat(subtotal.toFixed(2)) + 'VND');
             }
 
+            var jwtToken = '@Model.JWT';
+
             // API Call to Update Quantity in Cart
             function updateItemQuantityInCart(cartId, quantity) {
                 $.ajax({
                     url: `https://localhost:7223/api/v1/Cart/Quantity?CartId=${cartId}&Quantity=${quantity}`, // Replace with your API URL
                     type: 'PUT',
                     contentType: 'application/json',
+                    headers: { "Authorization": "Bearer " + jwtToken },
                     success: function (response) {
                         console.log(response); // Log the response from the server
                         if (response === "Update quantity success") {

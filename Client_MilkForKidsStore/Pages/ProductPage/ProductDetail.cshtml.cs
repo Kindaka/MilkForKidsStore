@@ -74,13 +74,15 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
         {
             try
             {
-                var customerId = GetCustomerId();
+                var jwtToken = Request.Cookies["jsonToken"];
+                var customerId = GetCustomerId(jwtToken);
                 var cartDtoRequest = new CartDtoRequest
                 {
                     ProductId = ProductId,
                     CustomerId = customerId,
                     CartQuantity = Quantity,
                 };
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", jwtToken);
 
                 var response = await _httpClient.PostAsJsonAsync("https://localhost:7223/api/v1/Cart", cartDtoRequest);
                 if (response.IsSuccessStatusCode)
@@ -110,7 +112,8 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
 
             try
             {
-                var customerId = GetCustomerId();
+                var jwtToken = Request.Cookies["jsonToken"];
+                var customerId = GetCustomerId(jwtToken);
 
                 var feedbackDtoRequest = new FeedbackDtoRequest
                 {
@@ -152,12 +155,11 @@ namespace Client_MilkForKidsStore.Pages.ProductPage
             }
         }
 
-        public int GetCustomerId()
+        public int GetCustomerId(string? accessToken)
         {
-            var accessToken = Request.Cookies["jsonToken"];
             if (string.IsNullOrEmpty(accessToken))
             {
-                RedirectToPage("/Login");
+                RedirectToPage("/AuthenticatePage/Login");
             }
             else
             {
